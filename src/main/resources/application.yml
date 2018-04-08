@@ -1,0 +1,7 @@
+filepath: /home/baymin/gali--url/
+spring:
+  http:
+    multipart:
+      enabled: true
+      max-file-size: 30MB
+      max-request-size: 30MB
