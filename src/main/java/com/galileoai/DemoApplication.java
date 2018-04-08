@@ -1,6 +1,5 @@
 package com.galileoai;
 
-import org.python.util.PythonInterpreter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -61,16 +60,16 @@ public class DemoApplication {
 		}
 
 		//调用python校验图片
-		PythonInterpreter interpreter = new PythonInterpreter();
-		interpreter.exec("print('hello')");
+/*		PythonInterpreter interpreter = new PythonInterpreter();
+		interpreter.exec("print('hello')");*/
 		String res="上传成功";
 		try {
 			//String a=getPara("car").substring(1),b="D34567",c="LJeff34",d="iqngfao";
 			//String[] args1=new String[]{ "python", "D:\\pyworkpeace\\9_30_1.py", a, b, c, d };
 			//Process pr=Runtime.getRuntime().exec(args1);
-			String url="http://blog.csdn.net/thorny_v/article/details/61417386";
+			String url="数组结果";
 			System.out.println("start;"+url);
-			String[] args1 = new String[] { "python", "/home/baymin/test.py", url};
+			String[] args1 = new String[] { "python", filepath+"test.py", url};
 			Process pr=Runtime.getRuntime().exec(args1);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					pr.getInputStream()));
@@ -87,8 +86,19 @@ public class DemoApplication {
 			e.printStackTrace();
 		}
 
-
-		return res;
+		return "{\n" +
+				"\t\"code\": 0,\n" +
+				"\t\"data\": [{\n" +
+				"\t\t\t\"name\": \"玫瑰花\",\n" +
+				"\t\t\t\"value\": 0.87\n" +
+				"\t\t},\n" +
+				"\t\t{\n" +
+				"\t\t\t\"name\": \"菊花\",\n" +
+				"\t\t\t\"value\": 0.77\n" +
+				"\t\t}\n" +
+				"\t]\n" +
+				"}";
+		//return res;
 	}
 
 	@Configuration

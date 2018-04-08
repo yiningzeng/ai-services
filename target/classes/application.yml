@@ -1,4 +1,4 @@
-filepath: /home/baymin/gali--url/
+filepath: /home/test/
 spring:
   http:
     multipart:
