@@ -26,6 +26,8 @@ public class DemoApplication {
 
 	@Value("${filepath}")
 	private String filepath;
+	@Value("${pythonpath}")
+	private String pythonpath;//
 	//@Value("${kuayu-origin}")
 
 	public static void main(String[] args) {
@@ -46,11 +48,14 @@ public class DemoApplication {
 			e.printStackTrace();
 		}*/
 
+		String fileAllPath="";
 		try {
 			// Get the file and save it somewhere
 			byte[] bytes = file.getBytes();
 
-			FileOutputStream out = new FileOutputStream(filepath+"test.jpg");
+			fileAllPath=filepath+System.currentTimeMillis()+".jpg";
+
+			FileOutputStream out = new FileOutputStream(fileAllPath);
 			out.write(bytes);
 			out.flush();
 			out.close();
@@ -62,14 +67,17 @@ public class DemoApplication {
 		//调用python校验图片
 /*		PythonInterpreter interpreter = new PythonInterpreter();
 		interpreter.exec("print('hello')");*/
-		String res="上传成功";
+
+
+若找不到更好的，只能通过存到本地的文件去获取了！！！！
+		String res="";
 		try {
 			//String a=getPara("car").substring(1),b="D34567",c="LJeff34",d="iqngfao";
 			//String[] args1=new String[]{ "python", "D:\\pyworkpeace\\9_30_1.py", a, b, c, d };
 			//Process pr=Runtime.getRuntime().exec(args1);
 			String url="数组结果";
 			System.out.println("start;"+url);
-			String[] args1 = new String[] { "python", filepath+"test.py", url};
+			String[] args1 = new String[] { "python", pythonpath,"--img="+fileAllPath};
 			Process pr=Runtime.getRuntime().exec(args1);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					pr.getInputStream()));
@@ -84,9 +92,10 @@ public class DemoApplication {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			res=e.getMessage();
 		}
 
-		return "{\n" +
+		/*return "{\n" +
 				"\t\"code\": 0,\n" +
 				"\t\"data\": [{\n" +
 				"\t\t\t\"name\": \"玫瑰花\",\n" +
@@ -97,8 +106,8 @@ public class DemoApplication {
 				"\t\t\t\"value\": 0.77\n" +
 				"\t\t}\n" +
 				"\t]\n" +
-				"}";
-		//return res;
+				"}";*/
+		return res;
 	}
 
 	@Configuration
