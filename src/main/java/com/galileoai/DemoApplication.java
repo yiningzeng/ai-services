@@ -40,24 +40,12 @@ public class DemoApplication {
 	//@Value("${kuayu-origin}")
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
 
 	@PostMapping(value = "/val")
 	public Object userUpdatePass(@RequestParam("file") MultipartFile file)throws Exception {
-		/*try {
-			// Get the file and save it somewhere
-			byte[] bytes = file.getBytes();
-			Path path = Paths.get(filepath+"test.jpg");
-			Files.write(path, bytes);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
-
-
 		try {
 			File dir=new File(filepath);
 			if(!dir.exists()){
@@ -79,37 +67,35 @@ public class DemoApplication {
 				logger.info("测试url:" + url);
 			}
 			String res=MyOkHttpClient.getInstance().get(url);
+
+			//{"res": "[[3,5,4,2,1,0]]"}
 			logger.info("返回值："+res);
 			JsonObject obj = new JsonParser().parse(res).getAsJsonObject();
 			String list=obj.get("res").getAsString();
+			String[] stringList=list.replace("[[","").split(",",2);
 
-			String[] stringList=list.split(",");
-			int i=0;
-			for (String str:stringList) {
-				if(str.contains("1")){
-					break;
-				}
-				i++;
-			}
 			String finalRes="识别有误";
-			switch (i){
-				case 0:
+			switch (stringList[0]){
+				case "0":
 					finalRes="绿色磁铁";
 					break;
-				case 1:
+				case "1":
 					finalRes="黑色磁铁";
 					break;
-				case 2:
+				case "2":
 					finalRes="重纹理";
 					break;
-				case 3:
+				case "3":
 					finalRes="轻纹理";
 					break;
-				case 4:
-					finalRes="四孔纸板";
+				case "4":
+					finalRes="漏装";
 					break;
-				case 5:
-					finalRes="五孔纸板";
+				case "5":
+					finalRes="安装正确";
+					break;
+				case "6":
+					finalRes="错装";
 					break;
 			}
 			return R.success(finalRes);
