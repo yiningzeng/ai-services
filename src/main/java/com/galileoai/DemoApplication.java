@@ -1,5 +1,12 @@
 package com.galileoai;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,22 +19,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.MultipartConfigElement;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @SpringBootApplication
 @RestController
 public class DemoApplication {
 
+	private final static Logger logger = LoggerFactory.getLogger(DemoApplication.class);
 	@Value("${filepath}")
 	private String filepath;
 	@Value("${pythonpath}")
 	private String pythonpath;//
+	@Value("${istest}")
+	private Integer istest;//
 	//@Value("${kuayu-origin}")
 
 	public static void main(String[] args) {
@@ -48,66 +57,66 @@ public class DemoApplication {
 			e.printStackTrace();
 		}*/
 
-		String fileAllPath="";
+
 		try {
+			File dir=new File(filepath);
+			if(!dir.exists()){
+				dir.mkdirs();
+			}
 			// Get the file and save it somewhere
 			byte[] bytes = file.getBytes();
-
+			String fileAllPath="";
 			fileAllPath=filepath+System.currentTimeMillis()+".jpg";
 
 			FileOutputStream out = new FileOutputStream(fileAllPath);
 			out.write(bytes);
 			out.flush();
 			out.close();
+			String url="http://47.98.42.128:8081?file="+ URLEncoder.encode(fileAllPath,"UTF-8");
+			logger.info("生产url:"+url);
+			if(istest==1) {
+				url = "http://47.98.42.128:8081?file=%2froot%2ftflearn%2fexamples%2fimages%2ftest%2f1.jpg";
+				logger.info("测试url:" + url);
+			}
+			String res=MyOkHttpClient.getInstance().get(url);
+			logger.info("返回值："+res);
+			JsonObject obj = new JsonParser().parse(res).getAsJsonObject();
+			String list=obj.get("res").getAsString();
 
+			String[] stringList=list.split(",");
+			int i=0;
+			for (String str:stringList) {
+				if(str.contains("1")){
+					break;
+				}
+				i++;
+			}
+			String finalRes="识别有误";
+			switch (i){
+				case 0:
+					finalRes="绿色磁铁";
+					break;
+				case 1:
+					finalRes="黑色磁铁";
+					break;
+				case 2:
+					finalRes="重纹理";
+					break;
+				case 3:
+					finalRes="轻纹理";
+					break;
+				case 4:
+					finalRes="四孔纸板";
+					break;
+				case 5:
+					finalRes="五孔纸板";
+					break;
+			}
+			return R.success(finalRes);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return R.error(e.getMessage());
 		}
-
-		//调用python校验图片
-/*		PythonInterpreter interpreter = new PythonInterpreter();
-		interpreter.exec("print('hello')");*/
-
-
-若找不到更好的，只能通过存到本地的文件去获取了！！！！
-		String res="";
-		try {
-			//String a=getPara("car").substring(1),b="D34567",c="LJeff34",d="iqngfao";
-			//String[] args1=new String[]{ "python", "D:\\pyworkpeace\\9_30_1.py", a, b, c, d };
-			//Process pr=Runtime.getRuntime().exec(args1);
-			String url="数组结果";
-			System.out.println("start;"+url);
-			String[] args1 = new String[] { "python", pythonpath,"--img="+fileAllPath};
-			Process pr=Runtime.getRuntime().exec(args1);
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					pr.getInputStream()));
-			String line;
-			while ((line = in.readLine()) != null) {
-				res+=line;
-				System.out.println(line);
-			}
-			in.close();
-			pr.waitFor();
-			System.out.println("end");
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			res=e.getMessage();
-		}
-
-		/*return "{\n" +
-				"\t\"code\": 0,\n" +
-				"\t\"data\": [{\n" +
-				"\t\t\t\"name\": \"玫瑰花\",\n" +
-				"\t\t\t\"value\": 0.87\n" +
-				"\t\t},\n" +
-				"\t\t{\n" +
-				"\t\t\t\"name\": \"菊花\",\n" +
-				"\t\t\t\"value\": 0.77\n" +
-				"\t\t}\n" +
-				"\t]\n" +
-				"}";*/
-		return res;
 	}
 
 	@Configuration
