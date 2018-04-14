@@ -80,7 +80,7 @@ public class DemoApplication {
 					finalRes="绿色磁铁";
 					break;
 				case "1":
-					finalRes="黑色磁铁";
+					finalRes="红色磁铁";
 					break;
 				case "2":
 					finalRes="重纹理";
@@ -89,13 +89,16 @@ public class DemoApplication {
 					finalRes="轻纹理";
 					break;
 				case "4":
-					finalRes="漏装";
-					break;
-				case "5":
 					finalRes="安装正确";
 					break;
+				case "5":
+					finalRes="漏装";
+					break;
 				case "6":
-					finalRes="错装";
+					finalRes="有杯垫";
+					break;
+				case "7":
+					finalRes="漏装杯垫";
 					break;
 			}
 			return R.success(finalRes);
