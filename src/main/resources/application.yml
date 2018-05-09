@@ -1,7 +1,10 @@
 filepath: /home/baymin/tflearn/examples/images/
 #python文件路径和模型的路径
 pythonpath: /home/baymin/tflearn/examples/images/vgg_network_recognize.py
-istest: 1
+#文本框识别的
+shpath: /opt/lampp/htdocs/galileo-video/test.sh
+
+istest: 0
 
 server:
   port: 8082

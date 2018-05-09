@@ -32,4 +32,5 @@ public class R {
         result.setData(object);
         return result;
     }
+
 }
