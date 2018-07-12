@@ -20,10 +20,11 @@ shpath: /home/icubic/xie/detectron/test2.sh
 istest: 0
 isbaidu: 0
 
-server:
-  port: 8070
-
+# mysql
 spring:
+  # 环境 dev|test|pro
+  profiles:
+    active: vip
   http:
     multipart:
       enabled: true

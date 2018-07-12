@@ -1,10 +1,14 @@
 
 package com.galileoai.controller;
 
+import com.baidu.aip.bodyanalysis.AipBodyAnalysis;
 import com.baidu.aip.face.MatchRequest;
 import com.galileoai.R;
 import com.galileoai.config.BaiduAipFace;
+import com.galileoai.dao.BaiduApiConfigDao;
+import com.galileoai.entity.BaiduApiConfig;
 import com.galileoai.model.BodyAttr;
+import com.galileoai.service.BaiduService;
 import com.galileoai.utils.Utils;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
@@ -40,6 +44,11 @@ public class BaiduPersonController {
 
     @Autowired
     private BaiduAipFace baiduAipFace;
+
+    @Autowired
+    private BaiduApiConfigDao baiduApiConfigDao;
+    @Autowired
+    private BaiduService baiduService;
     /**
      * 图片分类画框
      * @return
@@ -54,7 +63,8 @@ public class BaiduPersonController {
     public Object faceDetect(@RequestParam(value = "image")
                                          String image)throws Exception {
 
-
+        baiduAipFace.updateBaiduConfig();
+        //BaiduApiConfig aa= baiduApiConfigDao.findByDo_numLessThan(500);
         // 传入可选参数调用接口
         /*HashMap<String, String> options = new HashMap<String, String>();
         options.put("face_field", "age");
@@ -111,7 +121,6 @@ public class BaiduPersonController {
             System.out.println(res.toString());
             return R.success(res.toString());*/
 
-
             Double score=0.00;
             try {
                 JSONObject res = baiduAipFace.aipFaceIni().match(requests).getJSONObject("result");
@@ -143,14 +152,18 @@ public class BaiduPersonController {
     public Object bodySearch(@RequestParam("file") MultipartFile file)throws Exception {
 
         try {
+            baiduService.updateBaiduConfig();
+            AipBodyAnalysis aipBodyAnalysis=baiduService.AipBodyAnalysis();
+            if(aipBodyAnalysis==null)return R.error(0.00);
+
             // 传入可选参数调用接口
             HashMap<String, String> options = new HashMap<String, String>();
             options.put("type", "upper_color,lower_color");
 
 
-            JSONObject res = baiduAipFace.AipBodyAnalysis().bodyAttr(file.getBytes(), options);
+            JSONObject res = aipBodyAnalysis.bodyAttr(file.getBytes(), options);
 
-
+            baiduService.updateBaiduConfig();
             System.out.println(res.toString());
             Gson gson = new Gson();
             BodyAttr bodyAttr = gson.fromJson(res.toString(), BodyAttr.class);
@@ -178,15 +191,20 @@ public class BaiduPersonController {
                                                     String image)throws Exception {
 
         try {
+            baiduService.updateBaiduConfig();
+            AipBodyAnalysis aipBodyAnalysis=baiduService.AipBodyAnalysis();
+            if(aipBodyAnalysis==null)return R.error(0.00);
             // 传入可选参数调用接口
             HashMap<String, String> options = new HashMap<String, String>();
             options.put("type", "upper_color,lower_color");
-            JSONObject res = baiduAipFace.AipBodyAnalysis().bodyAttr(Utils.getByteByImgbase64(image), options);
+            JSONObject res = aipBodyAnalysis.bodyAttr(Utils.getByteByImgbase64(image), options);
 
 
             System.out.println(res.toString());
             Gson gson = new Gson();
             BodyAttr bodyAttr = gson.fromJson(res.toString(), BodyAttr.class);
+
+
             return R.success(res.toString());
         }
         catch (Exception err){

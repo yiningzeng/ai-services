@@ -30,8 +30,9 @@ public class Swagger2 {
         return new ApiInfoBuilder()
                 .title("API")
                 .termsOfServiceUrl("http://www.galileo-ai.com/")
-                .contact("zw@waterver.cn")
+                .contact("zengwei@galileo-ai.com")
                 .version("2.0")
+                .description("包含各种接口信息等")
                 .build();
     }
 }
