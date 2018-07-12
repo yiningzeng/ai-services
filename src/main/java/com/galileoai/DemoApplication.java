@@ -3,6 +3,7 @@ package com.galileoai;
 import com.baidu.aip.ocr.AipOcr;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.galileoai.ret.ResPlate;
+import com.galileoai.utils.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -28,6 +29,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -60,6 +62,48 @@ public class DemoApplication {
 			int randNumber = random.nextInt(4) + 1;
 			System.out.println(randNumber);}
 
+
+
+
+		/**
+		 * eyJ2ZXIiOjEsImhhc2giOiI0NDE5ZDNjZjAyODJlNzE3YjQwZDg2MWY5ODFiZmIxMiIsIm5vbmNlIjoiNWI0NzY2NTllNWQ4ZCIsImV4cGlyZWQiOjE1MzM5OTc5MTN9
+		 * eyJ2ZXIiOjEsImhhc2giOiI0NDE5ZDNjZjAyODJlNzE3YjQwZDg2MWY5ODFiZmIxMiIsIm5vbmNlIjoiNWI0NzY2NTllNWQ4ZCIsImV4cGlyZWQiOjE1MzM5OTc5MTN9
+		 * eyJ2ZXIiOjEsImhhc2giOiI0NDE5ZDNjZjAyODJlNzE3YjQwZDg2MWY5ODFiZmIxMiIsIm5vbmNlIjoiNWI0NzY2NTllNWQ4ZCIsImV4cGlyZWQiOjE1MzM5OTc5MTN9
+		 *  $nonce = uniqid();
+		 *     $expired = time() + $expired_add; //单位:秒
+		 *
+		 *     $app_key = str_replace("0x", "", $app_key);
+		 *     $app_key = str_replace(",", "", $app_key);
+		 *     if(strlen($app_key) < 32) {
+		 *         return false;
+		 *     }
+		 *     $app_key_32 = substr($app_key, 0, 32);
+		 *
+		 *     $source = $app_id.$app_key_32.$idname.$nonce.$expired;
+		 *     $sum = md5($source);
+		 *
+		 *     $tokenInfo = [
+		 *         'ver' => 1,
+		 *         'hash'  => $sum,
+		 *         'nonce' => $nonce,
+		 *         'expired' => $expired,
+		 *     ];
+		 *     $token = base64_encode(json_encode($tokenInfo));
+		 *     return $token;
+		 *
+		 *
+		 *
+		 */
+
+
+
+
+
+
+
+
+
+		System.out.println(Utils.getNowDate());
 
 		SpringApplication.run(DemoApplication.class, args);
 	}

@@ -5,6 +5,7 @@ package com.galileoai.controller;
 import com.galileoai.MyOkHttpClient;
 import com.galileoai.ShellKit;
 import com.galileoai.ret.Res;
+import com.galileoai.service.BaiduService;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,8 @@ public class ToolsController {
     private String filepath;
     @Value("${shpath}")
     private String shpath;
+
+
     /**
      * 图片分类画框
      * @return
