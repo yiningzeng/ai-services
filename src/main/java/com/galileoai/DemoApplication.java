@@ -1,10 +1,14 @@
 package com.galileoai;
 
+import com.baidu.aip.ocr.AipOcr;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.galileoai.ret.ResPlate;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import io.swagger.annotations.ApiImplicitParam;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +28,9 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootApplication
 @RestController
@@ -38,8 +44,23 @@ public class DemoApplication {
 	@Value("${istest}")
 	private Integer istest;//
 	//@Value("${kuayu-origin}")
+//设置APPID/AK/SK
+	public static AipOcr client;
+	public static final String APP_ID = "11170015";
+	public static final String API_KEY = "Bvk4osbTe2QG0vWfC1bZ4fmW";
+	public static final String SECRET_KEY = "QTsdvvUTIEjrvd26VaCNpfAONAZGN45f";
+	//@Value("${kuayu-origin}")
 
 	public static void main(String[] args) {
+		client= new AipOcr(APP_ID, API_KEY, SECRET_KEY);
+		client.setConnectionTimeoutInMillis(2000);
+		client.setSocketTimeoutInMillis(60000);
+		Random random=new Random(5);
+		for (int i=0;i<100;i++){
+			int randNumber = random.nextInt(4) + 1;
+			System.out.println(randNumber);}
+
+
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
@@ -107,6 +128,106 @@ public class DemoApplication {
 			return R.error(e.getMessage());
 		}
 	}
+
+	@PostMapping(value = "/plate")
+	public Object plate(@RequestParam("file") MultipartFile file)throws Exception {
+		ResPlate resPlate=new ResPlate();
+		try {
+			File dir=new File(filepath);
+			if(!dir.exists()){
+				dir.mkdirs();
+			}
+			// Get the file and save it asdsd
+			byte[] bytes = file.getBytes();
+			String fileAllPath="";
+			fileAllPath=filepath+System.currentTimeMillis()+".jpg";
+
+			FileOutputStream out = new FileOutputStream(fileAllPath);
+			out.write(bytes);
+			out.flush();
+			out.close();
+
+			// 初始化一个AipOcr
+			client.setConnectionTimeoutInMillis(2000);
+			client.setSocketTimeoutInMillis(60000);
+			// 传入可选参数调用接口
+			HashMap<String, String> options = new HashMap<String, String>();
+			options.put("multi_detect", "true");
+
+
+			// 参数为本地图片路径
+			//String image = "test.jpg";
+			// = client.plateLicense(image, options);
+			//System.out.println(res.toString(2));
+
+			// 参数为本地图片二进制数组
+			JSONObject aa= client.plateLicense(file.getBytes(), options);
+			//region
+			System.out.println(aa.toString(2));
+			String json = "{\n" +
+					"  \"log_id\": 8670858267801205732,\n" +
+					"  \"words_result\": [{\n" +
+					"    \"number\": \"皖Q15538\",\n" +
+					"    \"vertexes_location\": [\n" +
+					"      {\n" +
+					"        \"x\": 104,\n" +
+					"        \"y\": 1408\n" +
+					"      },\n" +
+					"      {\n" +
+					"        \"x\": 211,\n" +
+					"        \"y\": 1415\n" +
+					"      },\n" +
+					"      {\n" +
+					"        \"x\": 208,\n" +
+					"        \"y\": 1448\n" +
+					"      },\n" +
+					"      {\n" +
+					"        \"x\": 101,\n" +
+					"        \"y\": 1441\n" +
+					"      }\n" +
+					"    ],\n" +
+					"    \"color\": \"blue\",\n" +
+					"    \"probability\": [\n" +
+					"      0.9762517213821411,\n" +
+					"      0.9999984502792358,\n" +
+					"      0.9999880790710449,\n" +
+					"      0.9999998807907104,\n" +
+					"      0.9999996423721313,\n" +
+					"      0.9999998807907104,\n" +
+					"      0.9999992847442627\n" +
+					"    ]\n" +
+					"  }]\n" +
+					"}";
+			//endregion
+			try{
+				JsonObject jsonObject =new JsonParser().parse(aa.toString()).getAsJsonObject().get("words_result").getAsJsonArray().get(0).getAsJsonObject();
+				resPlate.setNumber(jsonObject.get("number").getAsString());
+				JsonArray jsonArray= jsonObject.getAsJsonArray("vertexes_location");
+
+				JsonObject pointLeftTop=jsonArray.get(0).getAsJsonObject();
+				JsonObject pointRightTop=jsonArray.get(1).getAsJsonObject();
+				JsonObject pointRightBottom=jsonArray.get(2).getAsJsonObject();
+				JsonObject pointLeftBottom=jsonArray.get(3).getAsJsonObject();
+
+
+				resPlate.setX(pointLeftTop.get("x").getAsInt());
+				resPlate.setY(pointLeftTop.get("y").getAsInt());
+
+				resPlate.setW(pointRightBottom.get("x").getAsInt()-pointLeftTop.get("x").getAsInt());
+				resPlate.setH(pointRightBottom.get("y").getAsInt()-pointLeftTop.get("y").getAsInt());
+				//if(pointLeftTop.get("x").getAsInt()<)
+				return R.success(resPlate);
+			}
+			catch (Exception er){
+				return R.error("");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return R.error(e.getMessage());
+		}
+	}
+
+
 
 	@Configuration
 	public class CommonConfig {

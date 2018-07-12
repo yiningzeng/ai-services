@@ -2,11 +2,7 @@
 package com.galileoai.controller;
 
 
-import com.galileo_ai.interaction.R;
-import com.galileo_ai.interaction.ret.user.UserReturn;
-import com.galileo_ai.service.ToolsService;
-import com.galileo_ai.service.UserService;
-import com.galileo_ai.utils.CreateNamePicture;
+import com.galileoai.MyOkHttpClient;
 import com.galileoai.ShellKit;
 import com.galileoai.ret.Res;
 import io.swagger.annotations.*;
@@ -22,6 +18,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by baymin
@@ -44,7 +42,54 @@ public class ToolsController {
      */
     @ApiOperation(value="图片上传")
     @PostMapping(value = "/img")
-    public Object userLogin(@RequestParam("file") MultipartFile file)throws Exception {
+    @ApiImplicitParam(name = "type", value = "检测点类型", required = true, dataType = "string",paramType = "query")
+    public Object userLogin(@RequestParam(value = "type")
+                                                    Integer type,
+                            @RequestParam("file") MultipartFile file)throws Exception {
+        String ress="";
+        try {
+            File dir = new File(filepath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            // Get the file and save it somewhere
+            byte[] bytes = file.getBytes();
+            String fileAllPath = "";
+            String name=System.currentTimeMillis()+".jpg";
+            fileAllPath = filepath + name ;
+            FileOutputStream out = new FileOutputStream(fileAllPath);
+            out.write(bytes);
+            out.flush();
+            out.close();
+            logger.info("开始录制toolsServi");
+            String url="";
+            if(type==1) {
+                //String aa=ShellKit.runShell(shpath+" " + fileAllPath);
+                 url = "http://localhost:8088?file=" + URLEncoder.encode("/home/icubic/xie1/" + name, "UTF-8");
+            }
+            else if(type==2){
+                url = "http://localhost:8086?file=" + URLEncoder.encode("/home/icubic/xie1/" + name, "UTF-8");
+            }
+            else if(type==3){
+                url = "http://localhost:8087?file=" + URLEncoder.encode("/home/icubic/xie1/" + name, "UTF-8");
+            }
+            logger.info("生产url:"+url);
+            ress=MyOkHttpClient.getInstance().get(url);
+            logger.info("录制没错");
+            logger.info(ress);
+        } catch (Exception er) {
+            er.printStackTrace();
+        }
+        return ress;
+    }
+    /**
+     * 图片分类画框
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value="图片上传")
+    @GetMapping(value = "/img")
+    public Object getimg(@RequestParam("file") MultipartFile file)throws Exception {
         Res res = new Res();
         res.setCode(-1);
         res.setMsg("有误");
@@ -63,24 +108,12 @@ public class ToolsController {
             out.flush();
             out.close();
 
-            logger.info("开始录制toolsServi");
-            ShellKit.runShell(shpath+" " + fileAllPath);
-            logger.info("录制没错");
-            res.setCode(0);
-            res.setMsg("");
+            return out;
 
         } catch (Exception er) {
+            er.printStackTrace();
         }
 
-
-
-        res.setTime(new Date());
-        res.setType(0);//图片类型
-        res.setUrl("获取图片的网址");
-        res.setX(12);
-        res.setY(23);
-        res.setW(100);
-        res.setH(20);
         return res;
     }
 }

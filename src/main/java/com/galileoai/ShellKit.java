@@ -32,9 +32,10 @@ public class ShellKit {
      * @throws IOException
      * 注:如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流.
      */
-    public static  List<String> runShell(String shStr) throws Exception {
-        List<String> strList = new ArrayList<String>();
+    public static  String runShell(String shStr) throws Exception {
+        //List<String> strList = new ArrayList<String>();
 
+        String res="";
         Process process;
         process = Runtime.getRuntime().exec(new String[] {"/bin/sh","-c",shStr},null,null);
 
@@ -45,23 +46,24 @@ public class ShellKit {
         String line;
 
 
-        StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
+        //StreamGobbler errorGobbler = new StreamGobbler(process.getErrorStream(), "ERROR");
         // kick off stderr
-        errorGobbler.start();
+        //errorGobbler.start();
 
-        StreamGobbler outGobbler = new StreamGobbler(process.getInputStream(), "STDOUT");
+        //StreamGobbler outGobbler = new StreamGobbler(process.getInputStream(), "STDOUT");
         // kick off stdout
-        outGobbler.start();
+        //outGobbler.start();
 
-        /*InputStreamReader ir = new InputStreamReader(process
-                .getInputStream());
-        LineNumberReader input = new LineNumberReader(ir);
-        String line;
-        process.waitFor();
+        //InputStreamReader ir = new InputStreamReader(process
+        //        .getInputStream());
+        //LineNumberReader input = new LineNumberReader(ir);
+        //String line;
         while ((line = input.readLine()) != null) {
-            strList.add(line);
-        }*/
+            //strList.add(line);
+            res +=line;
+            System.out.println(line);
+        }
 
-        return strList;
+        return res;
     }
 }

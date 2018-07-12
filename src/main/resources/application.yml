@@ -1,13 +1,27 @@
-filepath: /home/baymin/tflearn/examples/images/
+filepath: /home/icubic/xie1/
+
+
+
+baidu-app-id: 11504520
+baidu-api-key: pHn96o7ZZ7wzLauHLQU0Xeam
+baidu-secret-key: TfdM82oDfb46Ku5cj1t85TtOuzGWjCO3
+
+
+#车牌参数
+platepath: /home/baymin/upload_plate/
+plateurl: http://localhost:8071
+#车牌参数
+
 #python文件路径和模型的路径
 pythonpath: /home/baymin/tflearn/examples/images/vgg_network_recognize.py
 #文本框识别的
-shpath: /opt/lampp/htdocs/galileo-video/test.sh
+shpath: /home/icubic/xie/detectron/test2.sh
 
 istest: 0
+isbaidu: 0
 
 server:
-  port: 8082
+  port: 8070
 
 spring:
   http:

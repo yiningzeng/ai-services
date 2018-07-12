@@ -3,6 +3,7 @@ package com.galileoai;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 
 /**
@@ -17,7 +18,11 @@ public class MyOkHttpClient {
 
     public MyOkHttpClient()
     {
-        okHttpClient=new OkHttpClient();
+        //okHttpClient=new OkHttpClient();
+        okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(500, TimeUnit.SECONDS)
+                .readTimeout(500, TimeUnit.SECONDS)
+                .build();
     }
 
     public static MyOkHttpClient getInstance() {
@@ -63,11 +68,12 @@ public class MyOkHttpClient {
             return e.getMessage();
         }
     }
-    public String post(String url,String body)
+    public String platePost(String url,String body)
     {
         RequestBody requestBody = RequestBody.create(MediaType.parse("text"), body);
         Request request = new Request.Builder()
-                .url(url).header("api-key","7SxikPTF7XE9xsrfW4erQWjZSCk=")
+                .url(url).header("Authorization","APPCODE f6f3f2d2dffe4e06908e77a5e38e50f1")
+                .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8")
                 .post(requestBody)
                 .build();
         try {
@@ -78,6 +84,24 @@ public class MyOkHttpClient {
         }
     }
 
+    public String lplatePost(String url,String imgBase64String)
+    {
+        FormBody formBody = new FormBody
+                .Builder()
+                .add("image",imgBase64String)//设置参数名称和参数值
+                .build();
+        Request request = new Request.Builder()
+                .url(url).header("Authorization","APPCODE f6f3f2d2dffe4e06908e77a5e38e50f1")
+                .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8")
+                .post(formBody)
+                .build();
+        try {
+            return okHttpClient.newCall(request).execute().body().string();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public void asyncGet(String url, Callback callback) {
         Request request = new Request.Builder().url(url).build();
         okHttpClient.newCall(request).enqueue(callback);

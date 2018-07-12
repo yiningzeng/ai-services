@@ -28,5 +28,5 @@ public class Res {
     @ApiModelProperty(value = "边框高")
     private Integer h;
     @ApiModelProperty(value = "生成时间")
-    private Date time;
+    private Long time;
 }
