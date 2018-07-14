@@ -1,5 +1,6 @@
 package com.galileoai.config.alibaba;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,14 @@ import com.alibaba.druid.support.http.WebStatFilter;
 @Configuration
 public class DruidConfiguration {
 
+
+    @Value("$(ip-white-list)")
+    private String ipWhiteList;
+    @Value("$(ip-black-list)")
+    private String ipBlackList;
+
+
+
     /**
      * 注册一个StatViewServlet
      * @return
@@ -30,9 +39,9 @@ public class DruidConfiguration {
         //添加初始化参数：initParams
 
         //白名单：
-        servletRegistrationBean.addInitParameter("allow","127.0.0.1");
+        servletRegistrationBean.addInitParameter("allow",ipWhiteList);
         //IP黑名单 (存在共同时，deny优先于allow) : 如果满足deny的话提示:Sorry, you are not permitted to view this page.
-        servletRegistrationBean.addInitParameter("deny","192.168.1.73");
+        servletRegistrationBean.addInitParameter("deny",ipBlackList);
         //登录查看信息的账号密码.
         servletRegistrationBean.addInitParameter("loginUsername","baymin");
         servletRegistrationBean.addInitParameter("loginPassword","baymin1024");
