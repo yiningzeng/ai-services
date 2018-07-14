@@ -1,3 +1,5 @@
+ip-white-list: 123.152.114.81 #英文都好分割
+ip-black-list: 192.168.1.225 #英文都好分割
 server:
   connector-port: 8082
   port: 8070
