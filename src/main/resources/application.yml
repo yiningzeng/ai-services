@@ -7,6 +7,10 @@ baidu-api-key: pHn96o7ZZ7wzLauHLQU0Xeam
 baidu-secret-key: TfdM82oDfb46Ku5cj1t85TtOuzGWjCO3
 
 
+face-api-key: TWUdTxmes7PPUzkv7tDJuHqPrrOrhA5q
+face-api-secret: jprPaWyPZqXJdjFAEgXacdJ5iypSCPHa
+
+
 #车牌参数
 platepath: /home/baymin/upload_plate/
 plateurl: http://localhost:8071
