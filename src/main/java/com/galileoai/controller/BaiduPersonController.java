@@ -5,6 +5,7 @@ import com.baidu.aip.bodyanalysis.AipBodyAnalysis;
 import com.baidu.aip.face.MatchRequest;
 import com.galileoai.R;
 import com.galileoai.config.BaiduAipFace;
+import com.galileoai.config.MyOkHttp;
 import com.galileoai.dao.BaiduApiConfigDao;
 import com.galileoai.entity.BaiduApiConfig;
 import com.galileoai.model.BodyAttr;
@@ -15,11 +16,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,6 +48,17 @@ import java.util.HashMap;
 public class BaiduPersonController {
     private final static Logger logger = LoggerFactory.getLogger(BaiduPersonController.class);
 
+    @Value("${baidu-face-score}")
+    private Double baiduFaceScore;//
+
+    @Value("${face-api-key}")
+    private String faceApiKey;
+    @Value("${face-api-secret}")
+    private String faceApiSecret;//
+    /**
+     * face-api-key: TWUdTxmes7PPUzkv7tDJuHqPrrOrhA5q
+     face-api-secret: jprPaWyPZqXJdjFAEgXacdJ5iypSCPHa
+     */
 
     @Autowired
     private BaiduAipFace baiduAipFace;
@@ -49,6 +67,8 @@ public class BaiduPersonController {
     private BaiduApiConfigDao baiduApiConfigDao;
     @Autowired
     private BaiduService baiduService;
+    @Autowired
+    private MyOkHttp myOkHttp;
     /**
      * 图片分类画框
      * @return
@@ -72,7 +92,13 @@ public class BaiduPersonController {
         options.put("face_type", "LIVE");*/
         String faceToken="no face";
         try {
-            JSONObject res = baiduAipFace.aipFaceIni().detect(image, "BASE64", null).getJSONObject("result");
+            JSONObject res = baiduAipFace.aipFaceIni().detect(image, "BASE64", null);
+
+            logger.info("人脸检测:"+res.toString());
+
+            res=res.getJSONObject("result");
+
+
             if (res != null) {
                 if (res.getInt("face_num") >= 1) {
                     JSONArray array = res.getJSONArray("face_list");
@@ -82,7 +108,8 @@ public class BaiduPersonController {
             }
         }
         catch (Exception e){
-
+            e.printStackTrace();
+            //logger.info(e.printStackTrace());
         }
         return R.error(faceToken);
     }
@@ -110,6 +137,7 @@ public class BaiduPersonController {
                             @RequestParam(value = "image2_type",defaultValue = "BASE64")
                                         String image2Type)throws Exception {
         try {
+            //logger.info("开始人脸比对:");
             // image1/image2也可以为url或facetoken, 相应的imageType参数需要与之对应。
             MatchRequest req1 = new MatchRequest(image1, image1Type);
             MatchRequest req2 = new MatchRequest(image2, image2Type);
@@ -121,22 +149,25 @@ public class BaiduPersonController {
             System.out.println(res.toString());
             return R.success(res.toString());*/
 
-            Double score=0.00;
+            Double score = 0.00;
             try {
-                JSONObject res = baiduAipFace.aipFaceIni().match(requests).getJSONObject("result");
+                JSONObject res = baiduAipFace.aipFaceIni().match(requests);
+                logger.info("人脸比对结果:" + res.toString());
+                res = res.getJSONObject("result");
                 System.out.println(res.toString());
                 //return R.success(res.toString());
 
                 if (res != null) {
                     return R.success(res.getDouble("score"));
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
 
+                //e.printStackTrace();
             }
             return R.error(score);
         }
         catch (Exception err){
+            //err.printStackTrace();
             return R.error(0.00);
         }
     }
