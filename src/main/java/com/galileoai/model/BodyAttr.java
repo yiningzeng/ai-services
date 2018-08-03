@@ -47,6 +47,7 @@ public class BodyAttr {
         public class Attributes{
             private LowerColor lower_color;
             private UpperColor upper_color;
+            private Headwear headwear;
 
             /**
              * 下半身颜色
@@ -70,6 +71,18 @@ public class BodyAttr {
 
             }
 
+            /**
+             * "headwear":{
+             *           "name":"无帽",
+             *           "score":0.3280346989631653
+             *         },
+             */
+            @AllArgsConstructor
+            @Data
+            public class Headwear{
+                private float score;
+                private String name;
+            }
         }
 
         /**

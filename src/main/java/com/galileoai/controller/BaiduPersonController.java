@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +49,12 @@ import java.util.HashMap;
 @Api(description = "人脸识别等")
 public class BaiduPersonController {
     private final static Logger logger = LoggerFactory.getLogger(BaiduPersonController.class);
+
+    @Value("${filepath}")
+    private String filepath;
+    @Value("${shpath}")
+    private String shpath;
+
 
     @Value("${baidu-face-score}")
     private Double baiduFaceScore;//
@@ -178,7 +186,7 @@ public class BaiduPersonController {
      * @return
      * @throws Exception
      */
-    @ApiOperation(value="特征值比对")
+    @ApiOperation(value="特征值比对,目前返回上下半身颜色和是否有带帽子")
     @PostMapping(value = "/body_attr")
     public Object bodySearch(@RequestParam("file") MultipartFile file)throws Exception {
 
@@ -189,7 +197,7 @@ public class BaiduPersonController {
 
             // 传入可选参数调用接口
             HashMap<String, String> options = new HashMap<String, String>();
-            options.put("type", "upper_color,lower_color");
+            options.put("type", "upper_color,lower_color,headwear");
 
 
             JSONObject res = aipBodyAnalysis.bodyAttr(file.getBytes(), options);
@@ -203,8 +211,6 @@ public class BaiduPersonController {
         catch (Exception err){
             return R.error(0.00);
         }
-
-
     }
 
     /**
@@ -222,12 +228,29 @@ public class BaiduPersonController {
                                                     String image)throws Exception {
 
         try {
+
+
+            File dir = new File(filepath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            // Get the file and save it somewhere
+
+
+            String fileAllPath = "";
+            String name=System.currentTimeMillis()+".jpg";
+            fileAllPath = filepath + name ;
+            Utils.Base64ToImage(image,fileAllPath);
+
+
+
+
             baiduService.updateBaiduConfig();
             AipBodyAnalysis aipBodyAnalysis=baiduService.AipBodyAnalysis();
             if(aipBodyAnalysis==null)return R.error(0.00);
             // 传入可选参数调用接口
             HashMap<String, String> options = new HashMap<String, String>();
-            options.put("type", "upper_color,lower_color");
+            options.put("type", "upper_color,lower_color,headwear");
             JSONObject res = aipBodyAnalysis.bodyAttr(Utils.getByteByImgbase64(image), options);
 
 
