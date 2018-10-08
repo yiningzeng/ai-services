@@ -19,13 +19,10 @@ import com.alibaba.druid.support.http.WebStatFilter;
 @Configuration
 public class DruidConfiguration {
 
-
     @Value("$(ip-white-list)")
     private String ipWhiteList;
     @Value("$(ip-black-list)")
     private String ipBlackList;
-
-
 
     /**
      * 注册一个StatViewServlet

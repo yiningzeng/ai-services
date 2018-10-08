@@ -22,12 +22,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by baymin
@@ -62,10 +66,12 @@ public class CarPlateController {
     @ApiOperation(value="车牌识别")
     @PostMapping(value = "/img")
     public Object getimg(@RequestParam("file") MultipartFile file)throws Exception {
+
         ResPlate resPlate = new ResPlate();
         //res.set(-1);
         //res.setMsg("有误");
         try {
+//            MultipartFile file=files[0];
             File dir = new File(platepath);
             if (!dir.exists()) {
                 dir.mkdirs();
@@ -204,4 +210,5 @@ public class CarPlateController {
 
         //return resPlate;
     }
+
 }

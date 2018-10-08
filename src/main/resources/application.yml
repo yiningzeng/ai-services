@@ -1,3 +1,16 @@
+kuayu-origin: "*"
+kuayu-methods: POST,GET,PATCH,OPTIONS,HEAD,DELETE
+kuayu-max-age: 3600
+kuayu-headers: reffers, Authorization, Origin, X-Requested-With, Content-Type, Accept
+#PCB
+pcbpath: /home/baymin/pcb_img/
+pcbTestingUrl: http://localhost
+pcbResultUrl: http://localhost
+#PCB
+
+
+
+
 filepath: /home/baymin/
 
 
