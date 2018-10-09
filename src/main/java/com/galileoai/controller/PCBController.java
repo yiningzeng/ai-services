@@ -5,6 +5,7 @@ package com.galileoai.controller;
 import com.galileoai.DemoApplication;
 import com.galileoai.MyOkHttpClient;
 import com.galileoai.R;
+import com.galileoai.ShellKit;
 import com.galileoai.ret.ResPcb;
 import com.galileoai.ret.ResPlate;
 import com.galileoai.utils.Base64Test;
@@ -46,6 +47,9 @@ public class PCBController {
     private String pcbTestingUrl;
     @Value("${pcbResultUrl}")
     private String pcbResultUrl;
+    @Value("${pcbRestartShellPath}")
+    private String pcbRestartShellPath;
+
 
 
     /**
@@ -55,8 +59,8 @@ public class PCBController {
      */
     @ApiOperation(value="pcb坏点检测")
     @PostMapping(value = "/testing")
-    public Object getimg(@RequestParam("file") MultipartFile file)throws Exception {
-
+    public Object getimg(@RequestParam(value = "port") String port,@RequestParam("file") MultipartFile file)throws Exception {
+//        ShellKit.runShell(pcbRestartShellPath);
         ResPcb resPcb = new ResPcb();
         //res.set(-1);
         //res.setMsg("有误");
@@ -79,14 +83,23 @@ public class PCBController {
             long now = System.currentTimeMillis();
 
 
-            String url = pcbTestingUrl+"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
+            String url = pcbTestingUrl+":"+port+"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
             String ress = MyOkHttpClient.getInstance().get(url);
+            ress=ress.replace("/opt/lampp/htdocs/img","http://pcbdemo.galileo-ai.com:7001/img");
 
-            ress="{\"num\": 1,url:\"https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png\"}";
+//            ress="{\"num\": 1,url:\"https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png\"}";
             logger.info("图片检测返回结果:"+ress);
 
+            try{
+                if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                    ShellKit.runShell(pcbRestartShellPath);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
             resPcb=new Gson().fromJson(ress, ResPcb.class);
             resPcb.setId(name);
             resPcb.setFileBeforeName(file.getOriginalFilename());
