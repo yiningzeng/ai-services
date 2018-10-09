@@ -4,8 +4,9 @@ kuayu-max-age: 3600
 kuayu-headers: reffers, Authorization, Origin, X-Requested-With, Content-Type, Accept
 #PCB
 pcbpath: /home/baymin/pcb_img/
-pcbTestingUrl: http://localhost
+pcbTestingUrl: http://192.168.31.182
 pcbResultUrl: http://localhost
+pcbRestartShellPath: /home/baymin/tt.sh
 #PCB
 
 
