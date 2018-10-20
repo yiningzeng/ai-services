@@ -1,5 +1,6 @@
 package com.galileoai;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.logging.Handler;
 /**
  * Created by baymin on 17-8-24.
  */
+@Slf4j
 public class MyOkHttpClient {
 
 
@@ -20,8 +22,8 @@ public class MyOkHttpClient {
     {
         //okHttpClient=new OkHttpClient();
         okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(500, TimeUnit.SECONDS)
-                .readTimeout(500, TimeUnit.SECONDS)
+                .connectTimeout(6000, TimeUnit.SECONDS)
+                .readTimeout(6000, TimeUnit.SECONDS)
                 .build();
     }
 
@@ -34,6 +36,25 @@ public class MyOkHttpClient {
             }
         }
         return myOkHttpClient;
+    }
+
+    public String aiPost(String url,String imgBase64String) {
+        try {
+            FormBody formBody = new FormBody
+                    .Builder()
+                    .add("file", imgBase64String)//设置参数名称和参数值
+                    .build();
+            Request request = new Request.Builder()
+                    .url(url)
+//                .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8")
+                    .post(formBody)
+                    .build();
+            return okHttpClient.newCall(request).execute().body().string();
+        } catch (IOException e) {
+//            e.printStackTrace();
+            log.debug("eeeee-----访问ai接口出错：{}",e);
+            return "{\"num\":-1, \"data\":\"" + e.getMessage() + "\"}";
+        }
     }
     /*OkHttpClient client = new OkHttpClient.Builder().build();
     Request request = new Request.Builder()
@@ -64,6 +85,7 @@ public class MyOkHttpClient {
         try {
             return okHttpClient.newCall(request).execute().body().string();
         } catch (IOException e) {
+            log.info("出错！！！！！！！");
             e.printStackTrace();
             return e.getMessage();
         }

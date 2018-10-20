@@ -9,7 +9,9 @@ pcbResultUrl: http://localhost
 pcbRestartShellPath: /home/baymin/tt.sh
 #PCB
 
-
+#Shangfei
+ShangfeiTestingUrl: http://192.168.31.182:8192
+#Shangfei
 
 
 filepath: /home/baymin/
