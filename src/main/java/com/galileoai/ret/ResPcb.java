@@ -17,4 +17,6 @@ public class ResPcb {
     private String fileBeforeName;
     @ApiModelProperty(value = "结果外网路径")
     private String url;
+    @ApiModelProperty(value = "标签")
+    private String label_str;
 }

@@ -86,33 +86,31 @@ public class PCBController {
             String url = pcbTestingUrl+":"+port+"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
-            String ress = MyOkHttpClient.getInstance().get(url);
-            ress=ress.replace("/opt/lampp/htdocs/img","http://pcbdemo.galileo-ai.com:7001/img");
-
-//            ress="{\"num\": 1,url:\"https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png\"}";
-            logger.info("图片检测返回结果:"+ress);
-
-            try{
+            while(true){
+                String ress = MyOkHttpClient.getInstance().get(url);
+                ress=ress.replace("/opt/lampp/htdocs/img","http://pcbdemo.galileo-ai.com:7001/img");
                 if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
-                    ShellKit.runShell(pcbRestartShellPath);
+                   continue;
                 }
+                logger.info("图片检测返回结果:"+ress);
+                resPcb=new Gson().fromJson(ress, ResPcb.class);
+                resPcb.setId(name);
+                resPcb.setFileBeforeName(file.getOriginalFilename());
+                return R.success(resPcb);
             }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-            resPcb=new Gson().fromJson(ress, ResPcb.class);
-            resPcb.setId(name);
-            resPcb.setFileBeforeName(file.getOriginalFilename());
-            return R.success(resPcb);
-
+//            try{
+//                if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+//                    ShellKit.runShell(pcbRestartShellPath);
+//                }
+//            }
+//            catch (Exception e){
+//                e.printStackTrace();
+//            }
         } catch (Exception er) {
             resPcb.setFileBeforeName(file.getOriginalFilename());
             er.printStackTrace();
             return R.error(resPcb);
         }
-
-
-
     }
 
 }
