@@ -22,6 +22,33 @@ public class ShellKit {
         }
     }
 
+
+    /**
+     * 运行shell
+     *
+     * @param shStr 需要执行的shell
+     * @return
+     * @throws IOException 注:如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流.
+     */
+    public static List<String> runShell(String shStr, StreamGobblerCallback.Work work) throws Exception {
+        List<String> strList = new ArrayList<String>();
+
+        Process process;
+        process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", shStr}, null, null);
+
+
+//        StreamGobblerCallback errorGobbler = new StreamGobblerCallback(process.getErrorStream(), "ERROR",work);
+//        // kick off stderr
+//        errorGobbler.start();
+
+        StreamGobblerCallback outGobbler = new StreamGobblerCallback(process.getInputStream(), "STDOUT",work);
+        // kick off stdout
+        outGobbler.start();
+
+        return strList;
+    }
+
+
     /**
      * 运行shell
      *
