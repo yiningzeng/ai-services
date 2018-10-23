@@ -1,6 +1,8 @@
 package com.galileoai;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.*;
 
 
@@ -8,6 +10,7 @@ import java.io.*;
  * 用于处理Runtime.getRuntime().exec产生的错误流及输出流
  * Created by baymin on 18-4-18.
  */
+@Slf4j
 public class StreamGobbler extends Thread {
     InputStream is;
     String type;
@@ -37,7 +40,8 @@ public class StreamGobbler extends Thread {
             while ( (line = br.readLine()) != null) {
                 if (pw != null)
                     pw.println(line);
-                System.out.println(type + ">" + line);
+                log.info("这里可以做手脚");
+                log.info("{}>{}",type,line);
             }
 
             if (pw != null)
