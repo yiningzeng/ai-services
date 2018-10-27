@@ -135,30 +135,31 @@ public class PCBController {
             out.close();
             long now = System.currentTimeMillis();
 
-
             String url = pcbTestingUrl+":"+port+"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
 
             String ress = MyOkHttpClient.getInstance().get(url);
-            ress=ress.replace("/opt/lampp/htdocs/img","http://pcbdemo.galileo-ai.com:7001/img");
+            ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
             if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
-                ress = MyOkHttpClient.getInstance().get(url);
+                logger.info("访问出错:"+ress);
+                int i=0;
+                while(i<10){
+                    i++;
+                    ress = MyOkHttpClient.getInstance().get(url);
+                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
+                    if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                        logger.info("访问出错:"+ress);
+                        continue;
+                    }
+                    else break;
+                }
             }
             logger.info("图片检测返回结果:"+ress);
             resPcb=new Gson().fromJson(ress, ResPcb.class);
             resPcb.setId(name);
             resPcb.setFileBeforeName(file.getOriginalFilename());
             return R.success(resPcb);
-
-//            try{
-//                if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
-//                    ShellKit.runShell(pcbRestartShellPath);
-//                }
-//            }
-//            catch (Exception e){
-//                e.printStackTrace();
-//            }
         } catch (Exception er) {
             resPcb.setFileBeforeName(file.getOriginalFilename());
             er.printStackTrace();

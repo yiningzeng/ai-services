@@ -22,6 +22,7 @@ public class MyOkHttpClient {
     {
         //okHttpClient=new OkHttpClient();
         okHttpClient = new OkHttpClient.Builder()
+                .writeTimeout(6000, TimeUnit.SECONDS)
                 .connectTimeout(6000, TimeUnit.SECONDS)
                 .readTimeout(6000, TimeUnit.SECONDS)
                 .build();
@@ -85,8 +86,8 @@ public class MyOkHttpClient {
         try {
             return okHttpClient.newCall(request).execute().body().string();
         } catch (IOException e) {
-            log.info("出错！！！！！！！");
-            e.printStackTrace();
+            log.info("出错！！！！！！！"+e.getMessage());
+//            e.printStackTrace();
             return e.getMessage();
         }
     }
