@@ -6,16 +6,13 @@ import com.galileoai.*;
 import com.galileoai.dao.AiResultDao;
 import com.galileoai.entity.AiResult;
 import com.galileoai.ret.ResPcb;
-import com.galileoai.ret.ResPlate;
-import com.galileoai.utils.Base64Test;
+import com.galileoai.utils.ExportExcelUtil;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +21,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.net.URLEncoder;
-import java.util.HashMap;
 
 /**
  * Created by baymin
@@ -44,8 +39,10 @@ public class PCBController {
     private String pcbpath;
     @Value("${pcbTestingUrl}")
     private String pcbTestingUrl;
-    @Value("${pcbResultUrl}")
-    private String pcbResultUrl;
+    @Value("${pcbOutNetAIImageBaseUrl}")
+    private String pcbOutNetAIImageBaseUrl;
+    @Value("${pcbOutNetExportBaseUrl}")
+    private String pcbOutNetExportBaseUrl;
     @Value("${pcbRestartShellPath}")
     private String pcbRestartShellPath;
 
@@ -56,6 +53,9 @@ public class PCBController {
     private String pcbServiceStop;
     @Value("${pcbServiceSearch}")
     private String pcbServiceSearch;
+
+    @Value("${excelPath}")
+    private String excelPath;
 
     @Autowired
     private AiResultDao aiResultDao;
@@ -109,6 +109,31 @@ public class PCBController {
         return "0";
     }
 
+    @ApiOperation(value="下载excel")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "port", required = true, dataType = "string",paramType = "path"),
+            @ApiImplicitParam(name = "startTime", value = "开始时间", required = true, dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "endTime", value = "结束时间", required = true, dataType = "string", paramType = "query"),
+    })
+    @GetMapping(value = "/service/{port}/excel")
+    public Object downloadExcel(@PathVariable("port") String port,
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "endTime") String endTime)throws Exception{
+        ExportExcelUtil<AiResult> util = new ExportExcelUtil<AiResult>();
+
+        String fileName = System.currentTimeMillis() + ".xls";
+
+        //id, file_name,num, time, final_label,final_score, port, url, create_time,result
+        String[] columnNames = { "ID", "文件名","检测到的数目", "检测时间", "判别类别", "判别类别置信概率", "检测端点", "在线结果图片", "检测时间",""};
+        try {
+            util.exportExcel("检测结果", columnNames, aiResultDao.findAll(port, startTime, endTime), new FileOutputStream(excelPath + fileName), ExportExcelUtil.EXCEL_FILE_2003);
+            return R.success(pcbOutNetExportBaseUrl + fileName);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return R.error("导出出错");
+    }
+
     /**
      * 图片分类画框
      * @return
@@ -124,10 +149,10 @@ public class PCBController {
         try {
 
 //            MultipartFile file=files[0];
-            File dir = new File(pcbpath);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
+//            File dir = new File(pcbpath);
+//            if (!dir.exists()) {
+//                dir.mkdirs();
+//            }
             // Get the file and save it somewhere
             byte[] bytes = file.getBytes();
 //            String fileAllPath = "";
@@ -139,20 +164,38 @@ public class PCBController {
 //            out.close();
 //            long now = System.currentTimeMillis();
 //
-            String url = pcbTestingUrl + ":" + port + "/infer/6" ;//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
+            String url = pcbTestingUrl + ":" + port + "/pandas/" ;//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
 
             String ress = MyOkHttpClient.getInstance().xiongmaoPost(url,bytes);
-            ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
-            resPcb = new ResPcb();
+            log.info("检测结果:"+ress);
+//            ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
+//            String ress = "{\"process_time\": 1.1531128883361816, \"img_name\": \"1560938728.jpg\", \"num\": 2, \"label_str\":\"OK,NG,0.6\"}";
+            resPcb=new Gson().fromJson(ress, ResPcb.class);
+            if (resPcb.getNum()>0){
+                resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
+            }
+            resPcb.setUrl(pcbOutNetAIImageBaseUrl+resPcb.getImg_name());
             resPcb.setFileBeforeName(file.getOriginalFilename());
-
+            resPcb.setId(file.getOriginalFilename());
 
             AiResult aiResult =new AiResult();
             aiResult.setFileName(resPcb.getFileBeforeName());
-            aiResult.setTime(resPcb.getTime());
-            aiResult.setResult("结果");
+            aiResult.setTime(resPcb.getProcess_time().substring(0,4));
+//            aiResult.setResult(resPcb.getPoints());
+            aiResult.setPort(port);
+            try{
+                String[] finalR =resPcb.getLabel_str().split(",");
+                aiResult.setFinalLabel(finalR[0]);
+                aiResult.setFinalScore(finalR[1]);
+            }
+            catch (Exception e){
+
+            }
+
+            aiResult.setNum(resPcb.getNum().toString());
+            aiResult.setUrl(resPcb.getUrl());
             aiResultDao.save(aiResult);
             return R.success(resPcb);
 

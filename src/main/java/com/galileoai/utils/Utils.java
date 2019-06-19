@@ -20,17 +20,17 @@ public class Utils {
 
         ExportExcelUtil<ResPcb> util = new ExportExcelUtil<ResPcb>();
 
-        List<ResPcb> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            list.add(new ResPcb("0",2,"80ms","[points]","name","http://192.168.1.1",""));
-            list.add(new ResPcb("0",3,"90ms","[points]","name","http://192.168.1.1",""));
-        }
-        String[] columnNames = { "ID", "检测点数", "检测时间","检测点","文件名","在线结果图片","null" };
-        try {
-            util.exportExcel("用户导出", columnNames, list, new FileOutputStream("test.xls"), ExportExcelUtil.EXCEL_FILE_2003);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        List<ResPcb> list = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            list.add(new ResPcb("0",2,"80ms","[points]","name","",""));
+//            list.add(new ResPcb("0",3,"90ms","[points]","name","http://192.168.1.1",""));
+//        }
+//        String[] columnNames = { "ID", "检测点数", "检测时间","检测点","文件名","在线结果图片" };
+//        try {
+//            util.exportExcel("用户导出", columnNames, list, new FileOutputStream("test.xls"), ExportExcelUtil.EXCEL_FILE_2003);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public static String getNowDate(){
