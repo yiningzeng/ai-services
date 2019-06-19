@@ -176,6 +176,7 @@ public class PCBController {
                 int i=0;
                 while(i<10){
                     i++;
+                    Thread.currentThread().sleep(1000);//毫秒
                     ress = MyOkHttpClient.getInstance().get(url);
 //                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
                     if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
