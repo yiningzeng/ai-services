@@ -30,13 +30,13 @@ public class AiResult {
     private String finalLabel;
     @ApiModelProperty(value = "判别类别置信概率", example = "0.3")
     private String finalScore;
-
+    @ApiModelProperty(value = "检测结果", example = "每个点的位置信息和标签")
+    private String result;
     @ApiModelProperty(value = "端口", example = "检测点的端口")
     private String port;
     @ApiModelProperty(value = "在线图片")
     private String url;
     @ApiModelProperty(value = "检测时间")
     private Date createTime=new Date();
-    @ApiModelProperty(value = "检测结果", example = "每个点的位置信息和标签")
-    private String result;
+
 }

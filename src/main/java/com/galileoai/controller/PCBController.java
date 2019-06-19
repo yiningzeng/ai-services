@@ -123,8 +123,8 @@ public class PCBController {
 
         String fileName = System.currentTimeMillis() + ".xls";
 
-        //id, file_name,num, time, final_label,final_score, port, url, create_time,result
-        String[] columnNames = { "ID", "文件名","检测到的数目", "检测时间", "判别类别", "判别类别置信概率", "检测端点", "在线结果图片", "检测时间",""};
+        //id, file_name,num, time, final_label,final_score,result, port, url, create_time
+        String[] columnNames = { "ID", "文件名","检测到的数目", "检测时间", "判别类别", "判别类别置信概率", "检测结果", "检测端点", "在线结果图片", "检测时间"};
         try {
             util.exportExcel("检测结果", columnNames, aiResultDao.findAll(port, startTime, endTime), new FileOutputStream(excelPath + fileName), ExportExcelUtil.EXCEL_FILE_2003);
             return R.success(pcbOutNetExportBaseUrl + fileName);
@@ -200,7 +200,7 @@ public class PCBController {
             AiResult aiResult =new AiResult();
             aiResult.setFileName(resPcb.getFileBeforeName());
             aiResult.setTime(resPcb.getProcess_time().substring(0,4));
-//            aiResult.setResult(resPcb.getPoints());
+            aiResult.setResult(resPcb.getPoints());
             aiResult.setPort(port);
             try{
                 String[] finalR =resPcb.getLabel_str().split(",");
