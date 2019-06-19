@@ -193,6 +193,10 @@ public class PCBController {
             if (resPcb.getNum()>0){
                 resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
             }
+            if(resPcb.getLabel_str().contains("others")){
+                resPcb.setLabel_str("others, ");
+            }
+
             resPcb.setUrl(pcbOutNetAIImageBaseUrl+resPcb.getImg_name());
             resPcb.setFileBeforeName(file.getOriginalFilename());
             resPcb.setId(file.getOriginalFilename());
