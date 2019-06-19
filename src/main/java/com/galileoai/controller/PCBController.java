@@ -3,6 +3,8 @@ package com.galileoai.controller;
 
 
 import com.galileoai.*;
+import com.galileoai.dao.AiResultDao;
+import com.galileoai.entity.AiResult;
 import com.galileoai.ret.ResPcb;
 import com.galileoai.ret.ResPlate;
 import com.galileoai.utils.Base64Test;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +57,8 @@ public class PCBController {
     @Value("${pcbServiceSearch}")
     private String pcbServiceSearch;
 
+    @Autowired
+    private AiResultDao aiResultDao;
 
     @ApiOperation(value="查询服务")
     @GetMapping(value = "/service/{port}/status/")
@@ -63,7 +68,6 @@ public class PCBController {
 
         ShellKit.runShell(pcbServiceSearch+" "+port,work);
         while (work.isDoing()){
-//            log.info("我");
             Thread.sleep(20);
         }
 //        Thread.sleep(500);
@@ -78,7 +82,7 @@ public class PCBController {
     public Object openService(@PathVariable("port") String port)throws Exception {
 
         StreamGobblerCallback.Work work = new StreamGobblerCallback.Work();
-        ShellKit.runShell(pcbServiceStart.replace("port", port), work);
+        ShellKit.runShell(pcbServiceStart + " " +port, work);
         while (work.isDoing()) {
 //            log.info("我");
             Thread.sleep(20);
@@ -126,40 +130,51 @@ public class PCBController {
             }
             // Get the file and save it somewhere
             byte[] bytes = file.getBytes();
-            String fileAllPath = "";
-            String name = file.getOriginalFilename() + ".jpg";
-            fileAllPath = pcbpath + name;
-            FileOutputStream out = new FileOutputStream(fileAllPath);
-            out.write(bytes);
-            out.flush();
-            out.close();
-            long now = System.currentTimeMillis();
-
-            String url = pcbTestingUrl+":"+port+"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
+//            String fileAllPath = "";
+//            String name = file.getOriginalFilename() + ".jpg";
+//            fileAllPath = pcbpath + name;
+//            FileOutputStream out = new FileOutputStream(fileAllPath);
+//            out.write(bytes);
+//            out.flush();
+//            out.close();
+//            long now = System.currentTimeMillis();
+//
+            String url = pcbTestingUrl + ":" + port + "/infer/6" ;//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
 
-            String ress = MyOkHttpClient.getInstance().get(url);
+            String ress = MyOkHttpClient.getInstance().xiongmaoPost(url,bytes);
             ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
-            if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
-                logger.info("访问出错:"+ress);
-                int i=0;
-                while(i<10){
-                    i++;
-                    ress = MyOkHttpClient.getInstance().get(url);
-                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
-                    if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
-                        logger.info("访问出错:"+ress);
-                        continue;
-                    }
-                    else break;
-                }
-            }
-            logger.info("图片检测返回结果:"+ress);
-            resPcb=new Gson().fromJson(ress, ResPcb.class);
-            resPcb.setId(name);
+            resPcb = new ResPcb();
             resPcb.setFileBeforeName(file.getOriginalFilename());
+
+
+            AiResult aiResult =new AiResult();
+            aiResult.setFileName(resPcb.getFileBeforeName());
+            aiResult.setTime(resPcb.getTime());
+            aiResult.setResult("结果");
+            aiResultDao.save(aiResult);
             return R.success(resPcb);
+
+//            if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+//                logger.info("访问出错:"+ress);
+//                int i=0;
+//                while(i<10){
+//                    i++;
+//                    ress = MyOkHttpClient.getInstance().get(url);
+//                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
+//                    if(ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+//                        logger.info("访问出错:"+ress);
+//                        continue;
+//                    }
+//                    else break;
+//                }
+//            }
+//            logger.info("图片检测返回结果:"+ress);
+//            resPcb=new Gson().fromJson(ress, ResPcb.class);
+//            resPcb.setId("");
+//            resPcb.setFileBeforeName(file.getOriginalFilename());
+//            return R.success(resPcb);
         } catch (Exception er) {
             resPcb.setFileBeforeName(file.getOriginalFilename());
             er.printStackTrace();

@@ -1,22 +1,36 @@
 package com.galileoai.utils;
 
+import com.galileoai.ret.ResPcb;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Utils {
 
     public static void main(String[] args) {
        System.out.println(getMD5("尼玛"));
+
+        ExportExcelUtil<ResPcb> util = new ExportExcelUtil<ResPcb>();
+
+        List<ResPcb> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(new ResPcb("0",2,"80ms","[points]","name","http://192.168.1.1",""));
+            list.add(new ResPcb("0",3,"90ms","[points]","name","http://192.168.1.1",""));
+        }
+        String[] columnNames = { "ID", "检测点数", "检测时间","检测点","文件名","在线结果图片","null" };
+        try {
+            util.exportExcel("用户导出", columnNames, list, new FileOutputStream("test.xls"), ExportExcelUtil.EXCEL_FILE_2003);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public static String getNowDate(){

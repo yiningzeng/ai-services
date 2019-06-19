@@ -4,14 +4,13 @@ kuayu-max-age: 3600
 kuayu-headers: reffers, Authorization, Origin, X-Requested-With, Content-Type, Accept
 #PCB
 pcbpath: /home/baymin/pcb_img/
-pcbTestingUrl: http://192.168.31.182
+pcbTestingUrl: http://localhost
 pcbResultUrl: http://localhost
 pcbRestartShellPath: /home/baymin/tt.sh
 
-pcbServiceStart: /opt/frpc/start_data-port.sh #中间端口号可以替换成真实的端口号
-
-pcbServiceStop: /opt/frpc/stop_data-by-port.sh #空格加端口号
-pcbServiceSearch: /opt/frpc/search_data-by-port.sh #空格加端口号
+pcbServiceStart: /home/baymin/work/xiaongmao-services/test/shell/start-by-port.sh #中间端口号可以替换成真实的端口号
+pcbServiceStop: /home/baymin/work/xiaongmao-services/test/shell/stop-by-port.sh #空格加端口号
+pcbServiceSearch: /home/baymin/work/xiaongmao-services/test/shell/search-by-port.sh #空格加端口号
 
 #PCB
 

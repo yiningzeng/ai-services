@@ -57,6 +57,26 @@ public class MyOkHttpClient {
             return "{\"num\":-1, \"data\":\"" + e.getMessage() + "\"}";
         }
     }
+
+    public String xiongmaoPost(String url,byte[] bytes) {
+        try {
+            RequestBody file = RequestBody.create(MediaType.parse("image/jpg"), bytes);
+//                    FormBody formBody = new FormBody
+//                            .Builder()
+//                            .add("file", imgBase64String)//设置参数名称和参数值
+//                            .build();
+            Request request = new Request.Builder()
+                    .url(url)
+//                .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8")
+                    .post(file)
+                    .build();
+            return okHttpClient.newCall(request).execute().body().string();
+        } catch (IOException e) {
+//            e.printStackTrace();
+            log.debug("eeeee-----访问ai接口出错：{}",e);
+            return "{\"num\":-1, \"data\":\"" + e.getMessage() + "\"}";
+        }
+    }
     /*OkHttpClient client = new OkHttpClient.Builder().build();
     Request request = new Request.Builder()
             .url(ENDPOINT)

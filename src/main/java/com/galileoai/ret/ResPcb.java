@@ -13,6 +13,10 @@ public class ResPcb {
     private String id;
     @ApiModelProperty(value = "识别个数")
     private Integer num=0;
+    @ApiModelProperty(value = "检测时间")
+    private String time;
+    @ApiModelProperty(value = "检测时间")
+    private String points;
     @ApiModelProperty(value = "图片之前的名字")
     private String fileBeforeName;
     @ApiModelProperty(value = "结果外网路径")
