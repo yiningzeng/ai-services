@@ -170,6 +170,22 @@ public class PCBController {
 
             String ress = MyOkHttpClient.getInstance().xiongmaoPost(url,bytes);
             log.info("检测结果:"+ress);
+
+            if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                logger.info("访问出错:"+ress);
+                int i=0;
+                while(i<10){
+                    i++;
+                    ress = MyOkHttpClient.getInstance().get(url);
+//                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
+                    if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                        logger.info("访问出错:"+ress);
+                        continue;
+                    }
+                    else break;
+                }
+            }
+
 //            ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
 //            String ress = "{\"process_time\": 1.1531128883361816, \"img_name\": \"1560938728.jpg\", \"num\": 2, \"label_str\":\"OK,NG,0.6\"}";
             resPcb=new Gson().fromJson(ress, ResPcb.class);
