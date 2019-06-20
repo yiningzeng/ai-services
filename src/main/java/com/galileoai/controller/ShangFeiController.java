@@ -58,7 +58,7 @@ public class ShangFeiController {
            })
     @PostMapping(value = "/testing")
     public Object doAction(@RequestParam(value = "img") String img) {
-        String res = MyOkHttpClient.getInstance().aiPost(ShangfeiTestingUrl, img);
+        String res = MyOkHttpClient.getInstance().aiPost(ShangfeiTestingUrl,img, img);
         log.info("图片检测返回结果->{}", res);
         if (res.contains("{\"num\":-1,")) return R.error("未识别出结果");
         res = res.replace("\"[", "[").replace("]\"", "]").replace("\\\"", "\"");

@@ -20,9 +20,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Encoder;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by baymin
@@ -124,7 +128,7 @@ public class PCBController {
         String fileName = System.currentTimeMillis() + ".xls";
 
         //id, file_name,num, time, final_label,final_score,result, port, url, create_time
-        String[] columnNames = { "ID", "文件名","检测到的数目", "检测时间", "判别类别", "判别类别置信概率", "检测结果", "检测端点", "在线结果图片", "检测时间"};
+        String[] columnNames = { "ID", "文件名","检测到的数目", "检测用时(秒)", "判别类别", "判别类别置信概率", "检测结果", "检测端点", "在线结果图片","接收图片时间", "完成时间"};
         try {
             util.exportExcel("检测结果", columnNames, aiResultDao.findAll(port, startTime, endTime), new FileOutputStream(excelPath + fileName), ExportExcelUtil.EXCEL_FILE_2003);
             return R.success(pcbOutNetExportBaseUrl + fileName);
@@ -143,6 +147,8 @@ public class PCBController {
     @PostMapping(value = "/testing")
     public Object getimg(@RequestParam(value = "port") String port,@RequestParam("file") MultipartFile file)throws Exception {
 //        ShellKit.runShell(pcbRestartShellPath);
+        AiResult aiResult =new AiResult();
+        aiResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date()));
         ResPcb resPcb = new ResPcb();
         //res.set(-1);
         //res.setMsg("有误");
@@ -164,11 +170,11 @@ public class PCBController {
 //            out.close();
 //            long now = System.currentTimeMillis();
 //
-            String url = pcbTestingUrl + ":" + port + "/pandas/" ;//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
+            String url = pcbTestingUrl + ":" + port + "/pandas/";//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
 
             logger.info("生产url:" + url);
 
-            String ress = MyOkHttpClient.getInstance().xiongmaoPost(url,bytes);
+            String ress = MyOkHttpClient.getInstance().aiPost(url,file.getOriginalFilename(),new BASE64Encoder().encode(bytes));
             log.info("检测结果:"+ress);
 
             if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
@@ -177,7 +183,7 @@ public class PCBController {
                 while(i<10){
                     i++;
                     Thread.currentThread().sleep(1000);//毫秒
-                    ress = MyOkHttpClient.getInstance().get(url);
+                    ress = MyOkHttpClient.getInstance().aiPost(url,file.getOriginalFilename(),new BASE64Encoder().encode(bytes));
 //                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
                     if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
                         logger.info("访问出错:"+ress);
@@ -193,6 +199,9 @@ public class PCBController {
             if (resPcb.getNum()>0){
                 resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
             }
+            else {
+                resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,","others, "));
+            }
             if(resPcb.getLabel_str().contains("others")){
                 resPcb.setLabel_str("others, ");
             }
@@ -201,7 +210,7 @@ public class PCBController {
             resPcb.setFileBeforeName(file.getOriginalFilename());
             resPcb.setId(file.getOriginalFilename());
 
-            AiResult aiResult =new AiResult();
+
             aiResult.setFileName(resPcb.getFileBeforeName());
             aiResult.setTime(resPcb.getProcess_time().substring(0,4));
             aiResult.setResult(resPcb.getPoints());
@@ -217,6 +226,7 @@ public class PCBController {
 
             aiResult.setNum(resPcb.getNum().toString());
             aiResult.setUrl(resPcb.getUrl());
+            aiResult.setCreateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date()));
             aiResultDao.save(aiResult);
             return R.success(resPcb);
 

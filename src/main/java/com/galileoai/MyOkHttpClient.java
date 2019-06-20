@@ -39,11 +39,12 @@ public class MyOkHttpClient {
         return myOkHttpClient;
     }
 
-    public String aiPost(String url,String imgBase64String) {
+    public String aiPost(String url,String fileName,String imgBase64String) {
         try {
             FormBody formBody = new FormBody
                     .Builder()
-                    .add("file", imgBase64String)//设置参数名称和参数值
+                    .add("photo", imgBase64String)//设置参数名称和参数值
+                    .add("name", fileName)//设置参数名称和参数值
                     .build();
             Request request = new Request.Builder()
                     .url(url)
