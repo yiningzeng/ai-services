@@ -16,9 +16,8 @@ import java.util.List;
 public class Utils {
 
     public static void main(String[] args) {
-       System.out.println(getMD5("尼玛"));
+       System.out.println( new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS").format(new Date()));
 
-        ExportExcelUtil<ResPcb> util = new ExportExcelUtil<ResPcb>();
 
 //        List<ResPcb> list = new ArrayList<>();
 //        for (int i = 0; i < 10; i++) {

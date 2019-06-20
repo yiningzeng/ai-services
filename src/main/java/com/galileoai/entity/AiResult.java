@@ -36,7 +36,9 @@ public class AiResult {
     private String port;
     @ApiModelProperty(value = "在线图片")
     private String url;
+    @ApiModelProperty(value = "接收到图片时间")
+    private String startTime;
     @ApiModelProperty(value = "检测时间")
-    private Date createTime=new Date();
+    private String createTime;
 
 }
