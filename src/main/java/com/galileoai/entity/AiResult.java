@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -30,6 +27,9 @@ public class AiResult {
     private String finalLabel;
     @ApiModelProperty(value = "判别类别置信概率", example = "0.3")
     private String finalScore;
+
+    @Lob
+    @Column(columnDefinition = "longtext")
     @ApiModelProperty(value = "检测结果", example = "每个点的位置信息和标签")
     private String result;
     @ApiModelProperty(value = "端口", example = "检测点的端口")
