@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import dva, { connect } from 'dva';
-import { LocaleProvider, DatePicker, message,Upload, Icon,Spin ,Button,Select} from 'antd';
+import { LocaleProvider, DatePicker, message, Upload, Icon, Spin, Button, Select, Input } from 'antd';
 // 由于 antd 组件的默认文案是英文，所以需要修改为中文
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import moment from 'moment';
@@ -9,6 +9,7 @@ import 'moment/locale/zh-cn';
 import { openS,closeS,searchS,downloadExcel} from './services/api';
 
 const { RangePicker } = DatePicker;
+const InputGroup = Input.Group;
 
 moment.locale('zh-cn');
 
@@ -20,6 +21,8 @@ class MyUpload extends React.Component {
         serviceStatus: undefined,
         loadingTip: "查询服务状态",
         fileList: [],
+        apiBaseUrl: "localhost",
+        apiPort: 8070,
         port: 8101,
         startTime: moment().subtract(2, "hours"),
         endTime: moment()
@@ -274,7 +277,7 @@ class MyUpload extends React.Component {
     render() {
         const Dragger = Upload.Dragger;
         const pp = {
-		action: `//aitest.api.qtingvision.com:888/pcb/testing?port=${this.state.port===undefined?8101:this.state.port}`,
+		action: `//${this.state.apiBaseUrl}:${this.state.apiPort}/pcb/testing?port=${this.state.port===undefined?8101:this.state.port}`,
             onChange: this.handleChange,
             multiple: true,
             accept: 'image/*',
@@ -285,7 +288,7 @@ class MyUpload extends React.Component {
                 <Spin spinning={this.state.serviceChange}
                       tip={`loading.....${this.state.loadingTip === undefined ? "查询服务状态" : this.state.loadingTip}`}>
                     <div style={{width: '50%', margin: '100px auto'}}>
-                        端口:
+                        检测服务端口:
                         <Select defaultValue={defaultPort} style={{ width: 120 }} onChange={this.selectHandleChange}>
                             <Option value="8097">8097</Option>
                             <Option value="8098">8098</Option>
@@ -309,10 +312,27 @@ class MyUpload extends React.Component {
                             <Button id="table-to-xls" style={{ marginLeft: 8 }} type="primary" size="small" onClick={this.searchOnChange}>手动查询服务状态</Button>
                         </div>
                         <div>
+                            接口地址:
+                            <InputGroup compact>
+                                <Input style={{ width: '40%' }} addonBefore="http://" defaultValue={this.state.apiBaseUrl} placeholder="网址不带http://" allowClear/>
+                                <Input
+                                    style={{
+                                        width: 30,
+                                        borderLeft: 0,
+                                        pointerEvents: 'none',
+                                        backgroundColor: '#fff',
+                                    }}
+                                    placeholder=":"
+                                    disabled
+                                />
+                                <Input style={{ width: '10%', textAlign: 'center', borderLeft: 0 }} defaultValue={this.state.apiPort} placeholder="port" />
+                            </InputGroup>
+                        </div>
+                        <div>
                             选择导出时间:
+                            <br/>
                             <RangePicker
                                 defaultValue={[this.state.startTime, this.state.endTime]}
-                                style={{marginTop: '20px'}}
                                 showTime={{ format: 'HH:mm' }}
                                 format="YYYY-MM-DD HH:mm"
                                 placeholder={['Start Time', 'End Time']}
