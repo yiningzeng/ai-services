@@ -110,12 +110,12 @@ class MyUpload extends React.Component {
                     file.uid = file.response.data.id;
                     if (file.response.data.num > 0) {
                         file.status = 'done';
-                        file.url = file.response.data.url;
+                        file.url = encodeURI(file.response.data.url);
                     }
                     else {
                         file.name = file.response.data.fileBeforeName + " others,";
                         file.status = 'done';
-                        file.url = file.response.data.url;
+                        file.url = encodeURI(file.response.data.url);
                     }
                     // else file.status='error';
                 }
