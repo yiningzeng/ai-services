@@ -13,7 +13,7 @@ const InputGroup = Input.Group;
 
 moment.locale('zh-cn');
 
-const defaultPort=8101;
+// const defaultPort=8101;
 
 class MyUpload extends React.Component {
     //       localStorage.setItem("apiBaseUrl", this.state.apiBaseUrl);
@@ -25,7 +25,7 @@ class MyUpload extends React.Component {
         fileList: [],
         apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?"localhost":localStorage.getItem("apiBaseUrl"),
         apiPort: localStorage.getItem("apiPort") === null?8070:localStorage.getItem("apiPort"),
-        port: localStorage.getItem("serverPort") === null?8101:localStorage.getItem("serverPort"),
+        port: localStorage.getItem("serverPort") === null?8100:localStorage.getItem("serverPort"),
         startTime: moment().subtract(2, "hours"),
         endTime: moment()
     };
@@ -54,7 +54,7 @@ class MyUpload extends React.Component {
         message.success(`正在查询服务开启状态...`);
         dispatch({
             type: 'service/searchS',
-            payload: defaultPort,
+            payload: this.state.port,
             callback: (v) => {
                 console.log(`${this.state.port}服务开启状态:${v}`);
                 if (v === 1) {
@@ -181,8 +181,8 @@ class MyUpload extends React.Component {
 
     searchOnChange = () => {
         const {dispatch} = this.props;
-        this.setState({serviceChange: true});
-        message.success(`正在查询服务....`);
+        this.setState({...this.state,serviceChange: true});
+        message.success(`正在查询服务....${this.state.port}`);
         // const { dispatch } = props;
         dispatch({
             type: 'service/searchS',
@@ -190,11 +190,11 @@ class MyUpload extends React.Component {
             callback: (v) => {
                 if (v === 1) {
                     message.success("当前服务已经开启");
-                    this.setState({serviceChange:false,serviceStatus:true});
+                    this.setState({...this.state,serviceChange:false,serviceStatus:true});
                 }
                 else{
                     message.success("当前服务已经关闭");
-                    this.setState({serviceChange:false,serviceStatus:false});
+                    this.setState({...this.state,serviceChange:false,serviceStatus:false});
                 }
             },
         });
@@ -203,8 +203,11 @@ class MyUpload extends React.Component {
     };
 
     selectHandleChange=(value)=> {
-        this.setState({port:value});
-        this.setState({serviceChange: true});
+        this.setState({
+            ...this.state,
+            port:value,
+            serviceChange: true
+        });
         message.success(`正在查询服务....`);
         // const { dispatch } = props;
         const {dispatch} = this.props;
@@ -214,11 +217,11 @@ class MyUpload extends React.Component {
             callback: (v) => {
                 if (v === 1) {
                     message.success("当前服务已经开启");
-                    this.setState({serviceChange:false,serviceStatus:true});
+                    this.setState({...this.state,serviceChange:false,serviceStatus:true});
                 }
                 else{
                     message.success("当前服务已经关闭");
-                    this.setState({serviceChange:false,serviceStatus:false});
+                    this.setState({...this.state,serviceChange:false,serviceStatus:false});
                 }
             },
         });
@@ -288,7 +291,7 @@ class MyUpload extends React.Component {
                       tip={`loading.....${this.state.loadingTip === undefined ? "查询服务状态" : this.state.loadingTip}`}>
                     <div style={{width: '50%', margin: '100px auto'}}>
                         检测服务端口:
-                        <Select defaultValue={defaultPort} style={{ width: 120 }} onChange={this.selectHandleChange}>
+                        <Select defaultValue={this.state.port} style={{ width: 120 }} onChange={this.selectHandleChange}>
                             <Option value="8097">8097</Option>
                             <Option value="8098">8098</Option>
                             <Option value="8099">8099</Option>
