@@ -4,3 +4,5 @@
 target/
 
 face_body_demo\.iml
+
+src/main/resources/application-vip\.yml

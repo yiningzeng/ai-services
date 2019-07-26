@@ -16,14 +16,16 @@ moment.locale('zh-cn');
 const defaultPort=8101;
 
 class MyUpload extends React.Component {
+    //       localStorage.setItem("apiBaseUrl", this.state.apiBaseUrl);
+    //         localStorage.setItem("apiPort", this.state.apiPort);
     state = {
         serviceChange: true,
         serviceStatus: undefined,
         loadingTip: "查询服务状态",
         fileList: [],
-        apiBaseUrl: "localhost",
-        apiPort: 8070,
-        port: 8101,
+        apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?"localhost":localStorage.getItem("apiBaseUrl"),
+        apiPort: localStorage.getItem("apiPort") === null?8070:localStorage.getItem("apiPort"),
+        port: localStorage.getItem("serverPort") === null?8101:localStorage.getItem("serverPort"),
         startTime: moment().subtract(2, "hours"),
         endTime: moment()
     };
@@ -226,6 +228,7 @@ class MyUpload extends React.Component {
     openOnChange = () => {
         const {dispatch} = this.props;
         this.setState({...this.state,serviceChange: true});
+
         message.success(`正在开启服务....`);
         // const { dispatch } = props;
         dispatch({
@@ -269,6 +272,7 @@ class MyUpload extends React.Component {
 
     };
 
+
     render() {
         const Dragger = Upload.Dragger;
         const pp = {
@@ -305,11 +309,24 @@ class MyUpload extends React.Component {
                                 <Button type="primary" size="small" onClick={this.closeOnChange}>关闭</Button>:
                                 <Button type="primary" size="small" onClick={this.openOnChange}>开启</Button>)}
                             <Button id="table-to-xls" style={{ marginLeft: 8 }} type="primary" size="small" onClick={this.searchOnChange}>手动查询服务状态</Button>
+                            <Button style={{ marginLeft: 8 }} type="primary" size="small" onClick={()=>{
+                                localStorage.setItem("apiBaseUrl", this.state.apiBaseUrl);
+                                localStorage.setItem("apiPort", this.state.apiPort);
+                                localStorage.setItem("serverPort", this.state.port);
+                                message.success("保存成功");
+                            }}>保存接口信息</Button>
                         </div>
                         <div>
                             接口地址:
                             <InputGroup compact>
-                                <Input style={{ width: '40%' }} addonBefore="http://" defaultValue={this.state.apiBaseUrl} placeholder="网址不带http://" allowClear/>
+                                <Input style={{ width: '40%' }} addonBefore="http://" defaultValue={this.state.apiBaseUrl}
+                                       onChange={e=>{
+                                           this.setState({
+                                               ...this.state,
+                                               apiBaseUrl: e.target.value,
+                                           });
+                                       }}
+                                       placeholder="网址不带http://" allowClear/>
                                 <Input
                                     style={{
                                         width: 30,
@@ -320,7 +337,12 @@ class MyUpload extends React.Component {
                                     placeholder=":"
                                     disabled
                                 />
-                                <Input style={{ width: '10%', textAlign: 'center', borderLeft: 0 }} defaultValue={this.state.apiPort} placeholder="port" />
+                                <Input style={{ width: '10%', textAlign: 'center', borderLeft: 0 }} onChange={(e)=>{
+                                    this.setState({
+                                        ...this.state,
+                                        apiPort: e.target.value,
+                                    });
+                                }} defaultValue={this.state.apiPort} placeholder="port" />
                             </InputGroup>
                         </div>
                         <div>
