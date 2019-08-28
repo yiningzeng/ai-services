@@ -215,15 +215,15 @@ public class PCBController {
                         }
                     }
                     log.info("检测结果:"+ress);
-                    resPcb.setLabel_str(resPcb.getLabel_str().replace("TTP2S",ress));
+                    resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,","").replace("TTP2S",ress));
                 }
                 else {
                     resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
                 }
             }
-            else {
-                resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,","others, "));
-            }
+//            else {
+//                resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,","others, "));
+//            }
             if(resPcb.getLabel_str().contains("others")){
                 resPcb.setLabel_str("others, ");
             }
