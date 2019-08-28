@@ -171,7 +171,7 @@ public class PCBController {
 //            long now = System.currentTimeMillis();
 //
             String url = pcbTestingUrl + ":" + port + "/pandas/";//"?file=" + URLEncoder.encode(pcbpath + name, "UTF-8");
-
+            String numUrl = pcbTestingUrl + ":9001" + "/num/";
             logger.info("生产url:" + url);
 
             String ress = MyOkHttpClient.getInstance().aiPost(url,file.getOriginalFilename(),new BASE64Encoder().encode(bytes));
@@ -197,7 +197,29 @@ public class PCBController {
 //            String ress = "{\"process_time\": 1.1531128883361816, \"img_name\": \"1560938728.jpg\", \"num\": 2, \"label_str\":\"OK,NG,0.6\"}";
             resPcb=new Gson().fromJson(ress, ResPcb.class);
             if (resPcb.getNum()>0){
-                resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
+                if(resPcb.getLabel_str().contains("TTP2S")){
+                    ress = MyOkHttpClient.getInstance().aiPost(numUrl,file.getOriginalFilename(),new BASE64Encoder().encode(bytes));
+                    if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                        logger.info("访问出错:"+ress);
+                        int i=0;
+                        while(i<10){
+                            i++;
+                            Thread.currentThread().sleep(1000);//毫秒
+                            ress = MyOkHttpClient.getInstance().aiPost(numUrl,file.getOriginalFilename(),new BASE64Encoder().encode(bytes));
+//                    ress=ress.replace("/opt/lampp/htdocs/img","http://111.231.134.58:81/img");
+                            if(ress.contains("500 Internal Server Error")||ress.contains("unexpected end of stream on Connection")||ress.contains("Connection reset")||ress.contains("Failed to connect to")){
+                                logger.info("访问出错:"+ress);
+                                continue;
+                            }
+                            else break;
+                        }
+                    }
+                    log.info("检测结果:"+ress);
+                    resPcb.setLabel_str(resPcb.getLabel_str().replace("TTP2S",ress));
+                }
+                else {
+                    resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,",""));
+                }
             }
             else {
                 resPcb.setLabel_str(resPcb.getLabel_str().replace("OK,","others, "));
