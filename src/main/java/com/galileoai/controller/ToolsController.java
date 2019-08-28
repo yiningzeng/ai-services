@@ -46,8 +46,7 @@ public class ToolsController {
     @ApiOperation(value="图片上传")
     @PostMapping(value = "/img")
     @ApiImplicitParam(name = "type", value = "检测点类型", required = true, dataType = "string",paramType = "query")
-    public Object userLogin(@RequestParam(value = "type")
-                                                    Integer type,
+    public Object userLogin(@RequestParam(value = "type") Integer type,
                             @RequestParam("file") MultipartFile file)throws Exception {
         String ress="";
         try {
