@@ -6,7 +6,7 @@ import { LocaleProvider, DatePicker, message, Upload, Icon, Spin, Button, Select
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { openS,closeS,searchS,downloadExcel} from './services/api';
+import { defaultIp, openS,closeS,searchS,downloadExcel} from './services/api';
 
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
@@ -23,7 +23,7 @@ class MyUpload extends React.Component {
         serviceStatus: undefined,
         loadingTip: "查询服务状态",
         fileList: [],
-        apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?"localhost":localStorage.getItem("apiBaseUrl"),
+        apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?defaultIp:localStorage.getItem("apiBaseUrl"),
         apiPort: localStorage.getItem("apiPort") === null?8070:localStorage.getItem("apiPort"),
         port: localStorage.getItem("serverPort") === null?8100:localStorage.getItem("serverPort"),
         startTime: moment().subtract(2, "hours"),
@@ -113,7 +113,7 @@ class MyUpload extends React.Component {
                         file.url = encodeURI(file.response.data.url);
                     }
                     else {
-                        file.name = file.response.data.fileBeforeName + " others,";
+                        // file.name = file.response.data.fileBeforeName + " TSFAS,";
                         file.status = 'done';
                         file.url = encodeURI(file.response.data.url);
                     }
@@ -121,7 +121,7 @@ class MyUpload extends React.Component {
                 }
                 else {
                     file.status = 'error';
-                    file.name = file.response.data.fileBeforeName + " (无法识别)";
+                    file.name = file.response.data.fileBeforeName + " (识别有误，请重试)";
                 }
                 // Component will show file.url as link
                 // file.url = file.response.url;
