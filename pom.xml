@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.galileoai</groupId>
-	<artifactId>face_body_demo</artifactId>
-	<version>v1.7.2</version>
+	<groupId>com.qtingvision</groupId>
+	<artifactId>power-ai-test-service</artifactId>
+	<version>v1.8.4</version>
 	<packaging>jar</packaging>
 
-	<name>face_body_demo</name>
+	<name>power-ai-test-service</name>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>

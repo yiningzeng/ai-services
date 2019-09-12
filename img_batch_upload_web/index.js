@@ -23,9 +23,10 @@ class MyUpload extends React.Component {
         serviceStatus: undefined,
         loadingTip: "查询服务状态",
         fileList: [],
-        apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?"localhost":localStorage.getItem("apiBaseUrl"),
-        apiPort: localStorage.getItem("apiPort") === null?8070:localStorage.getItem("apiPort"),
-        port: localStorage.getItem("serverPort") === null?8100:localStorage.getItem("serverPort"),
+        apiBaseUrl: localStorage.getItem("apiBaseUrl") === null?"ai.api.qtingvision.com":localStorage.getItem("apiBaseUrl"),
+        apiPort: localStorage.getItem("apiPort") === null?888:localStorage.getItem("apiPort"),
+        port: undefined,//localStorage.getItem("serverPort") === null?8100:localStorage.getItem("serverPort"),
+        assetsDir: "",
         startTime: moment().subtract(2, "hours"),
         endTime: moment()
     };
@@ -47,36 +48,38 @@ class MyUpload extends React.Component {
         catch (e) {
             console.error(e);
         }
-
-
-
-        const {dispatch} = this.props;
-        message.success(`正在查询服务开启状态...`);
-        dispatch({
-            type: 'service/searchS',
-            payload: this.state.port,
-            callback: (v) => {
-                console.log(`${this.state.port}服务开启状态:${v}`);
-                if (v === 1) {
-                    this.setState({...this.state,serviceChange: false, serviceStatus: true});
-                    this.forceUpdate();
-                }
-                else {
-                    this.setState({...this.state,serviceChange: false, serviceStatus: false});
-                }
-                // message.success(JSON.stringify(v));
-            },
+        this.setState({
+            ...this.state,
+            startTime: moment().subtract(2, "hours"),
+            endTime: moment(),
+            port: MyUpload.getQueryVariable("port"),
+            assetsDir: MyUpload.getQueryVariable("assets"),
+        },()=>{
+            const {dispatch} = this.props;
+            message.success(`正在查询服务开启状态...`);
+            dispatch({
+                type: 'service/searchS',
+                payload: this.state.port,
+                callback: (v) => {
+                    console.log(`${this.state.port}服务开启状态:${v}`);
+                    if (v === 1) {
+                        this.setState({...this.state,serviceChange: false, serviceStatus: true});
+                        this.forceUpdate();
+                    }
+                    else {
+                        this.setState({...this.state,serviceChange: false, serviceStatus: false});
+                    }
+                    // message.success(JSON.stringify(v));
+                },
+            });
         });
+
         // this.refs.table.refs.table.width='20%';
         // const tableCon = ReactDOM.findDOMNode(this.refs['tables']);
         // const table = tableCon.querySelector('table');
         // this.refs.table.setAttribute('id','table-to-xls');
 
-        this.setState({
-            ...this.state,
-            startTime: moment().subtract(2, "hours"),
-            endTime: moment()
-        });
+
     }
 
     datePickerOnChange = (value, dateString) => {
@@ -219,7 +222,7 @@ class MyUpload extends React.Component {
                     message.success("当前服务已经开启");
                     this.setState({...this.state,serviceChange:false,serviceStatus:true});
                 }
-                else{
+                else {
                     message.success("当前服务已经关闭");
                     this.setState({...this.state,serviceChange:false,serviceStatus:false});
                 }
@@ -275,8 +278,20 @@ class MyUpload extends React.Component {
 
     };
 
+    static getQueryVariable(variable)
+    {
+        const query = window.location.search.substring(1);
+        const vars = query.split("&");
+        for (let i=0;i<vars.length;i++) {
+            const pair = vars[i].split("=");
+            if(pair[0] === variable){return pair[1];}
+        }
+        return(false);
+    }
 
     render() {
+        // 获得URL参数
+        // message.success(MyUpload.getQueryVariable("id"));
         const Dragger = Upload.Dragger;
         const pp = {
 		action: `//${this.state.apiBaseUrl}:${this.state.apiPort}/pcb/testing?port=${this.state.port===undefined?8101:this.state.port}`,
@@ -291,7 +306,7 @@ class MyUpload extends React.Component {
                       tip={`loading.....${this.state.loadingTip === undefined ? "查询服务状态" : this.state.loadingTip}`}>
                     <div style={{width: '50%', margin: '100px auto'}}>
                         检测服务端口:
-                        <Select defaultValue={this.state.port} style={{ width: 120 }} onChange={this.selectHandleChange}>
+                        <Select defaultValue={this.state.port} value={this.state.port} style={{ width: 120 }} onChange={this.selectHandleChange}>
                             <Option value="8097">8097</Option>
                             <Option value="8098">8098</Option>
                             <Option value="8099">8099</Option>
@@ -309,8 +324,8 @@ class MyUpload extends React.Component {
                         </div>
                         <div>
                             {(this.state.serviceStatus!==undefined&&this.state.serviceStatus===true?
-                                <Button type="primary" size="small" onClick={this.closeOnChange}>关闭</Button>:
-                                <Button type="primary" size="small" onClick={this.openOnChange}>开启</Button>)}
+                                <Button type="primary" size="small" onClick={this.closeOnChange} disabled={true}>关闭</Button>:
+                                <Button type="primary" size="small" onClick={this.openOnChange} disabled={true}>开启</Button>)}
                             <Button id="table-to-xls" style={{ marginLeft: 8 }} type="primary" size="small" onClick={this.searchOnChange}>手动查询服务状态</Button>
                             <Button style={{ marginLeft: 8 }} type="primary" size="small" onClick={()=>{
                                 localStorage.setItem("apiBaseUrl", this.state.apiBaseUrl);

@@ -4,19 +4,19 @@ kuayu-max-age: 3600
 kuayu-headers: reffers, Authorization, Origin, X-Requested-With, Content-Type, Accept
 #PCB
 pcbpath: /home/baymin/pcb_img/
-pcbTestingUrl: http://192.168.31.157
+pcbTestingUrl: http://0.0.0.0
 pcbResultUrl: http://localhost
 pcbRestartShellPath: /home/baymin/tt.sh
 #pcbOutNetAIImageBaseUrl: http://aitest.qtingvision.com:888/aiimg/ #外网访问图片的基本路径
 #pcbOutNetExportBaseUrl: http://aitest.qtingvision.com:888/excel/ #外网访问图片的基本路径
-pcbOutNetAIImageBaseUrl: http://101.64.34.145:888/aiimg/ #外网访问图片的基本路径
-pcbOutNetExportBaseUrl: http://101.64.34.145:888/excel/ #外网访问图片的基本路径
+pcbOutNetAIImageBaseUrl: http://ai.qtingvision.com:888/aiimg/ #外网访问图片的基本路径
+pcbOutNetExportBaseUrl: http://ai.qtingvision.com:888/excel/ #外网访问图片的基本路径
 
 pcbServiceStart: /opt/ai/start-by-port.sh #中间端口号可以替换成真实的端口号
 pcbServiceStop: /opt/ai/stop-by-port.sh #空格加端口号
 pcbServiceSearch: /opt/ai/search-by-port.sh #空格加端口号
 
-excelPath: /opt/lampp/htdocs/excel/
+excelPath: /excel/
 #PCB
 
 #Shangfei

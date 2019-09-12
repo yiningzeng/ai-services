@@ -82,11 +82,20 @@ public class PCBController {
     }
 
     @ApiOperation(value="开服务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "port", required = true, dataType = "string",paramType = "path"),
+            @ApiImplicitParam(name = "cfg", value = "配置文件", defaultValue = "/darknet/assets/yolov3-voc-test.cfg", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "model", value = "权重文件", defaultValue = "/darknet/assets/backup/yolov3-voc_last.weights", dataType = "string", paramType = "query"),
+            @ApiImplicitParam(name = "thresh", value = "置信度", defaultValue = "0.1", dataType = "string", paramType = "query")
+    })
     @GetMapping(value = "/service/{port}/open/")
-    public Object openService(@PathVariable("port") String port)throws Exception {
+    public Object openService(@PathVariable("port") String port,
+                              @RequestParam(value = "cfg", defaultValue = "/darknet/assets/yolov3-voc-test.cfg") String cfg,
+                              @RequestParam(value = "model", defaultValue = "/darknet/assets/backup/yolov3-voc_last.weights") String model,
+                              @RequestParam(value = "thresh", defaultValue = "0.1") float thresh)throws Exception {
 
         StreamGobblerCallback.Work work = new StreamGobblerCallback.Work();
-        ShellKit.runShell(pcbServiceStart + " " +port, work);
+        ShellKit.runShell(pcbServiceStart + " " +port + " " +cfg+ " " +model+ " " +thresh, work);
         while (work.isDoing()) {
 //            log.info("我");
             Thread.sleep(20);
