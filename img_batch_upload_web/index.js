@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import dva, { connect } from 'dva';
-import { LocaleProvider, DatePicker, message, Upload, Icon, Spin, Button, Select, Input } from 'antd';
+import { LocaleProvider, Modal, DatePicker, message, Upload, Icon, Spin, Button, Select, Input, Divider } from 'antd';
 // 由于 antd 组件的默认文案是英文，所以需要修改为中文
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { openS,closeS,searchS,downloadExcel} from './services/api';
+import copy from 'clipboard-copy';
 
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
@@ -28,7 +29,9 @@ class MyUpload extends React.Component {
         port: undefined,//localStorage.getItem("serverPort") === null?8100:localStorage.getItem("serverPort"),
         assetsDir: "",
         startTime: moment().subtract(2, "hours"),
-        endTime: moment()
+        endTime: moment(),
+        javaUrl: "",
+        javaPort: 888,
     };
 
     constructor(props) {
@@ -54,9 +57,15 @@ class MyUpload extends React.Component {
             endTime: moment(),
             port: MyUpload.getQueryVariable("port"),
             assetsDir: MyUpload.getQueryVariable("assets"),
+            apiBaseUrl: MyUpload.getQueryVariable("javaUrl"),
+            apiPort: MyUpload.getQueryVariable("javaPort"),
         },()=>{
+            localStorage.setItem("apiBaseUrl", this.state.apiBaseUrl);
+            localStorage.setItem("apiPort", this.state.apiPort);
+            localStorage.setItem("serverPort", this.state.port);
+
             const {dispatch} = this.props;
-            message.success(`正在查询服务开启状态...`);
+            message.success(`注意！服务开启比较慢，请等待一会再查询\n正在查询服务开启状态...`);
             dispatch({
                 type: 'service/searchS',
                 payload: this.state.port,
@@ -305,6 +314,20 @@ class MyUpload extends React.Component {
                 <Spin spinning={this.state.serviceChange}
                       tip={`loading.....${this.state.loadingTip === undefined ? "查询服务状态" : this.state.loadingTip}`}>
                     <div style={{width: '50%', margin: '100px auto'}}>
+                        <div>
+                            <Button type="primary" size='large' onClick={()=>{
+                                location.reload()
+                            }}>刷新页面</Button>
+                            <Button style={{ marginLeft: "20px" }}  type="primary" size='large' onClick={()=>{
+                                const test=window.location.href.replace(window.location.host+"/test", "ai.test.qtingvision.com:888");
+                                copy(test);
+                                Modal.success({
+                                    title: '外网地址已成功复制到剪贴板，如果复制失败，请手动复制下面的连接',
+                                    content: test,
+                                });
+                            }}>复制外网地址</Button>
+                        </div>
+                        <Divider>服务</Divider>
                         检测服务端口:
                         <Select defaultValue={this.state.port} value={this.state.port} style={{ width: 120 }} onChange={this.selectHandleChange}>
                             <Option value="8097">8097</Option>
@@ -337,7 +360,7 @@ class MyUpload extends React.Component {
                         <div>
                             接口地址:
                             <InputGroup compact>
-                                <Input style={{ width: '40%' }} addonBefore="http://" defaultValue={this.state.apiBaseUrl}
+                                <Input style={{ width: '40%' }} addonBefore="http://" defaultValue={localStorage.getItem("apiBaseUrl") === null?this.state.apiBaseUrl:localStorage.getItem("apiBaseUrl")}
                                        onChange={e=>{
                                            this.setState({
                                                ...this.state,
@@ -360,7 +383,7 @@ class MyUpload extends React.Component {
                                         ...this.state,
                                         apiPort: e.target.value,
                                     });
-                                }} defaultValue={this.state.apiPort} placeholder="port" />
+                                }} defaultValue={localStorage.getItem("apiPort") === null?this.state.apiPort:localStorage.getItem("apiPort")} placeholder="port" />
                             </InputGroup>
                         </div>
                         <div>
