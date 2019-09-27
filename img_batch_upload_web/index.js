@@ -122,12 +122,12 @@ class MyUpload extends React.Component {
                     file.uid = file.response.data.id;
                     if (file.response.data.num > 0) {
                         file.status = 'done';
-                        file.url = encodeURI(file.response.data.url);
+                        file.url = encodeURI(file.response.data.url.replace("http://ai.qtingvision.com:888", ".."));
                     }
                     else {
-                        file.name = file.response.data.fileBeforeName + " others,";
+                        file.name = file.response.data.fileBeforeName + " ok,";
                         file.status = 'done';
-                        file.url = encodeURI(file.response.data.url);
+                        file.url = encodeURI(file.response.data.url.replace("http://ai.qtingvision.com:888", ".."));
                     }
                     // else file.status='error';
                 }
@@ -319,7 +319,7 @@ class MyUpload extends React.Component {
                                 location.reload()
                             }}>刷新页面</Button>
                             <Button style={{ marginLeft: "20px" }}  type="primary" size='large' onClick={()=>{
-                                const test=window.location.href.replace(window.location.host+"/test", "ai.test.qtingvision.com:888");
+                                const test=window.location.href.replace(window.location.host, "ai.test.qtingvision.com:888");
                                 copy(test);
                                 Modal.success({
                                     title: '外网地址已成功复制到剪贴板，如果复制失败，请手动复制下面的连接',
@@ -421,7 +421,7 @@ class MyUpload extends React.Component {
                             <p className="ant-upload-drag-icon">
                                 <Icon type="inbox"/>
                             </p>
-                            <p className="ant-upload-text">{`面板识别-检测点${this.state.port === 8097 ? 1 : this.state.port === 8098 ? 2 : this.state.port === 8099 ? 3 : this.state.port === 8100 ? 4 : ""}`}</p>
+                            <p className="ant-upload-text">{`上传图片${this.state.port === 8097 ? 1 : this.state.port === 8098 ? 2 : this.state.port === 8099 ? 3 : this.state.port === 8100 ? 4 : ""}`}</p>
                             <p className="ant-upload-hint">批量上传图片请点击或者拖放文件到该区域,支持单个或者批量的文件</p>
                         </Dragger>
                     </div>
